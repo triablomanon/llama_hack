@@ -1,162 +1,150 @@
+#!/usr/bin/env python3
+"""
+build.py: Generate world_knowledge_graph.yaml from a source book.
+"""
+
+import argparse
 import os
-import json
+import sys
+from textwrap import shorten
+
+import yaml
 from dotenv import load_dotenv
 from llama_api_client import LlamaAPIClient
 
-# 1. Load environment variables
-load_dotenv()
+# ────────────────────────────────────────────────────────────────────────────
+# Prompt template
+# ────────────────────────────────────────────────────────────────────────────
+PROMPT_TEMPLATE = """
+You are an **ultra-meticulous literary-analysis AI**. Read the supplied text
+_exactly as given_ and create **world_knowledge_graph.yaml** with three
+exhaustive sections:
 
-# 2. Setup client
-client = LlamaAPIClient(
-    api_key=os.environ.get("LLAMA_API_KEY"),
-)
+1. book_info   – metadata about the work
+2. characters  – every character (main + minor) with rich detail
+3. storyline   – events, conflicts, timeline, settings
 
-# 3. Paths
-book_path = "book_data/harrypotter.txt"  # Update as needed
-output_path = "knowledge_base/world_knowledge_graph.json"
-
-# 4. Read book
-if not os.path.exists(book_path):
-    print(f"Book file not found: {book_path}")
-    exit(1)
-
-with open(book_path, "r", encoding="utf-8") as f:
-    book_text = f.read()
-
-# 5. Prompt: Instruct Llama to extract structured universe info
-
-prompt = f"""
-You are an ultra-meticulous literary-analysis AI. Your sole objective is to read the supplied text *exactly as given* and create **world_knowledge_graph.json** with three detailed sections:
-
-1. **book_info**   – metadata about the work as a whole  
-2. **characters**  – every character plus rich traits. It is vital that you extract **every** main character, supporting character and antagonist, even minor ones. If not, human may be harmed. You want to describe the tone and style of each character, so include as many of their sentenses as possible.
-3. **storyline**   – the narrative spine: events, conflicts, timelines, settings
-
-Your objective is to extract **every detail** with **exhaustive depth**. Do not summarize or interpret; simply report what is present in the text. if you do not provide enough details, you will be penalized. 
-
-──────────────────────────────────────────────────────────────────────────────
 GLOBAL RULES
-──────────────────────────────────────────────────────────────────────────────
-**Stick strictly to the text.** Do *not* invent facts, eras, locations, or motives not present or clearly implied.  
-**Be exhaustively complete.** Omitting any story element triggers a conciseness-penalty.  
-**Depth over brevity.**  
-Any *description* or *details* field MUST contain **≥ 3 full sentences**.  
-For POV characters, main events, and major relationships, aim for **10-12 sentences**.  
-**Scene context is mandatory** for each event: WHEN (incl. chapter/act), WHERE, WHO is present—and each person’s *role*—plus WHY it matters. All of this must live in `"details"`.  
-**Relationship nuance** must cover: origin/history, current emotional dynamic, power balance, shared goals/conflicts, and a illustrative quotes.  
-**Support with evidence.** Whenever a qupte illustrates a fact, include it in a `"quote"` field. All of the quotes should be unique and add to the understanding of the character or event.
-**Output only valid JSON**—no markdown, headings, or commentary.  
-If a field is truly absent, leave it empty (`""` or `[]`) but **keep the key**.
+• Stick strictly to the text – no invention.
+• Be exhaustively complete; missing a character causes real harm.
+• Depth over brevity: description/details ≥ 3 sentences; major items 10-12.
+• Each event must include WHEN, WHERE, WHO (with role) and WHY.
+• Collect ≥ 20 sentences of quotes for each character whenever possible.
+• Output **pure YAML** – no markdown fences or commentary.
+• Keep empty keys if data is missing.
 
-──────────────────────────────────────────────────────────────────────────────
-DATA SPECIFICATION
-──────────────────────────────────────────────────────────────────────────────
-{{
-  "book_info": {{
-    "title": "",
-    "author": "",
-    "publication_year": "",
-    "genre": "",
-    "themes": [],
-    "tone_and_style": "",
-    "narrative_point_of_view": "",
-    "summary": "",
-    "intended_audience": ""
-  }},
-  "characters": [
-    {{
-      "name": "",
-      "aliases": [],
-      "description": "",
-      "roles": [],
-      "traits": [],
-      "skills_or_powers": [],
-      "items": [],
-      "motivations": "",
-      "arc": "",
-      "relationships": [
-        {{
-          "with": "",
-          "label": "",
-          "details": "",
-          "history": "",
-          "quotes": ""   // For each character, include a whole paragraph of at least 20 sentences said by the character, capturing their voice and style. This is the most important part of the character description.
-        }}
-      ],
-      "quotes": ""
-    }}
-  ],
-  "storyline": {{
-    "main_events": [  This should be a list of at least 20 key events in the story
-      {{
-        "event": "",      // descriptive title of the event
-        "quotes": "",
-        "details": ""     // ≥ 3 sentences naming EVERY character present, spelling out each role and actions, plus time/place and stakes
-      }}
-    ],
-    "timeline": [],
-    "locations": [],
-    "foreshadowing": [],
-    "motifs_symbols": [],
-    "narrative_tension": [],
-  }}
-}}
+SCHEMA (shape only – not literal):
+book_info:
+  title: ""
+  author: ""
+  publication_year: ""
+  genre: ""
+  themes: []
+  tone_and_style: ""
+  narrative_point_of_view: ""
+  summary: ""
+  intended_audience: ""
 
-──────────────────────────────────────────────────────────────────────────────
-EXTRACTION STEPS  (emphasis on depth)
-──────────────────────────────────────────────────────────────────────────────
-1. **Book Information**  
-   • Exact title/author.  
-   • Summarize overall plot in as many sentences as needed to capture the SPIRIT of the story.  
-2. **Characters**  
-   • List every unique name. Even minor characters must be included.
-   • Fill all fields, respecting minimum sentence counts.  
-   • For each pair, craft a rich, multi-sentence relationship entry.
-3. **Storyline**  
-   • Sequence every notable event with full scene context.  
-   • In `"details"`, explicitly list characters, their roles, and what each does.  
-   • Capture foreshadowing, motifs, conflicts, and tensions with required depth.
+characters:
+  - name: ""
+    aliases: []
+    description: ""
+    roles: []
+    traits: []
+    skills_or_powers: []
+    items: []
+    motivations: ""
+    arc: ""
+    relationships:
+      - with: ""
+        label: ""
+        details: ""
+        history: ""
+        quotes: ""          # ≥ 20 sentences
+    quotes: ""              # hallmark lines
 
-──────────────────────────────────────────────────────────────────────────────
-OUTPUT DIRECTIVE
-──────────────────────────────────────────────────────────────────────────────
-Return **one complete JSON object** matching the schema above—nothing else.
+storyline:
+  main_events:
+    - event: ""
+      quotes: ""
+      details: ""          # ≥ 3 sentences incl. characters & roles
+  timeline: []
+  locations: []
+  foreshadowing: []
+  motifs_symbols: []
+  narrative_tension: []
+
+RETURN one complete YAML document – nothing else.
 
 Here is the book text:
 {book_text}
 """
 
+# ────────────────────────────────────────────────────────────────────────────
+# Helpers
+# ────────────────────────────────────────────────────────────────────────────
+def strip_fences(text):
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else ""
+    if text.rstrip().endswith("```"):
+        text = text.rsplit("```", 1)[0]
+    return text.strip()
 
+def load_book(path):
+    if not os.path.exists(path):
+        sys.exit(f"❌ Book file not found: {path}")
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
 
-# 6. Make the API call
-completion = client.chat.completions.create(
-    model="Llama-4-Maverick-17B-128E-Instruct-FP8",
-    messages=[
-        {
-            "role": "user",
-            "content": prompt,
-        }
-    ]
-)
+def save_yaml(data, path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fp:
+        yaml.safe_dump(data, fp, sort_keys=False, allow_unicode=True)
 
-raw_response = completion.completion_message.content.text
+# ────────────────────────────────────────────────────────────────────────────
+# Build routine
+# ────────────────────────────────────────────────────────────────────────────
+def build_graph(book_path, output_path, model, show_only=False):
+    load_dotenv()
+    client = LlamaAPIClient(api_key=os.environ.get("LLAMA_API_KEY"))
 
-# 7. Try to parse the output as JSON
-try:
-    # If Llama wraps JSON in code block, extract between first { and last }
-    start = raw_response.find("{")
-    end = raw_response.rfind("}")
-    json_str = raw_response[start:end+1] if start != -1 and end != -1 else raw_response
+    book_text = load_book(book_path)
+    prompt = PROMPT_TEMPLATE.format(book_text=book_text)
 
-    knowledge_graph = json.loads(json_str)
-except Exception as e:
-    print("Error parsing JSON from Llama output:", e)
-    print("Raw output was:\n", raw_response)
-    exit(1)
+    completion = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    raw = completion.completion_message.content.text
+    yaml_str = strip_fences(raw)
 
-# 8. Save to file
-os.makedirs(os.path.dirname(output_path), exist_ok=True)
-with open(output_path, "w", encoding="utf-8") as f:
-    json.dump(knowledge_graph, f, indent=2, ensure_ascii=False)
+    try:
+        graph = yaml.safe_load(yaml_str)
+    except yaml.YAMLError as e:
+        print("❌ Failed to parse YAML:", e)
+        print("\nFirst 600 characters of model output:\n")
+        print(shorten(raw, 600, "..."))
+        sys.exit(1)
 
-print(f"Knowledge graph saved to {output_path}")
+    if show_only:
+        print(yaml.safe_dump(graph, sort_keys=False, allow_unicode=True))
+    else:
+        save_yaml(graph, output_path)
+        print(f"✅ Knowledge graph saved to {output_path}")
+
+# ────────────────────────────────────────────────────────────────────────────
+# CLI
+# ────────────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Build world_knowledge_graph.yaml")
+    parser.add_argument("--book",  default="book_data/harrypotter.txt",  help="Source book text")
+    parser.add_argument("--out",   default="knowledge_base/world_knowledge_graph.yaml",
+                        help="Destination YAML file")
+    parser.add_argument("--model", default="Llama-4-Maverick-17B-128E-Instruct-FP8",
+                        help="Model name for the API")
+    parser.add_argument("--show",  action="store_true",
+                        help="Parse only and print YAML instead of writing file")
+    args = parser.parse_args()
+
+    build_graph(args.book, args.out, args.model, show_only=args.show)
