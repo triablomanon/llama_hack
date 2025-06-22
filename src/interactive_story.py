@@ -136,7 +136,7 @@ def main():
     try:
         # Check if required files exist
         required_files = [
-            "knowledge_base/world_knowledge_graph.json",
+            "knowledge_base/world_knowledge_graph.yaml",
             "knowledge_base/dynamic_world_knowledge.json"
         ]
         

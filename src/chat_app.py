@@ -1,5 +1,6 @@
 import os
 import json
+import yaml
 import re
 import subprocess
 from datetime import datetime
@@ -21,7 +22,7 @@ client = LlamaAPIClient(
 )
 
 # Paths
-KG_PATH = "knowledge_base/world_knowledge_graph.json"
+KG_PATH = "knowledge_base/world_knowledge_graph.yaml"
 DYN_PATH = "knowledge_base/dynamic_world_knowledge.json"
 CHAT_HISTORY_PATH = "knowledge_base/chat_history.json"
 
@@ -40,7 +41,7 @@ def load_knowledge_graph():
         return None
     
     with open(KG_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+        return yaml.safe_load(f)
 
 def load_dynamic_world():
     """Load the dynamic world knowledge"""

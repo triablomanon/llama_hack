@@ -1,4 +1,5 @@
 import json
+import yaml
 import os
 from dotenv import load_dotenv
 
@@ -6,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Paths
-KG_PATH = "knowledge_base/world_knowledge_graph.json"
+KG_PATH = "knowledge_base/world_knowledge_graph.yaml"
 DYN_PATH = "knowledge_base/dynamic_world_knowledge.json"
 
 def generate_character_with_api(character_name: str, world_context: dict) -> dict:
@@ -72,7 +73,7 @@ def choose_character_and_initialize():
         raise FileNotFoundError(f"Knowledge graph file not found: {KG_PATH}")
 
     with open(KG_PATH, "r", encoding="utf-8") as f:
-        kg = json.load(f)
+        kg = yaml.safe_load(f)
 
     # 2. Gather character list
     characters = kg.get("characters", [])

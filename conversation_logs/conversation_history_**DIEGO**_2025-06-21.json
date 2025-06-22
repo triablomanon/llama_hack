@@ -1,0 +1,31 @@
+{
+  "character": "**DIEGO**",
+  "session_date": "2025-06-21",
+  "total_interactions": 3,
+  "story_progress": 1,
+  "conversation": [
+    {
+      "type": "system",
+      "content": "\n🎭 Welcome to the Interactive Story Experience! 🎭\n\nYou are **DIEGO**.\n\nRecent events:\n- Unknown event\n- Unknown event\n- Unknown event\n\n\n\nYou are now **DIEGO**. Your choices will shape the story and create unique paths.\nType your responses to continue the adventure!\n\nCommands:\n- 'status' - Check your character status\n- 'progress' - View story progress\n- 'endings' - See available story branches\n- 'quit' - End the session\n\nWhat would you like to do?\n",
+      "timestamp": "2025-06-21T22:37:14.824925"
+    },
+    {
+      "type": "user",
+      "content": "hi",
+      "timestamp": "2025-06-21T22:42:43.661477"
+    },
+    {
+      "type": "story",
+      "content": "As **DIEGO**, your response 'hi' changes the story in unexpected ways...\n\n**PAUL** notices your actions and reacts accordingly.",
+      "timestamp": "2025-06-21T22:42:43.663512",
+      "consequences": {
+        "emotional_impact": "",
+        "arc_development": "",
+        "items_gained": [],
+        "items_lost": [],
+        "relationship_changes": [],
+        "story_direction": ""
+      }
+    }
+  ]
+}

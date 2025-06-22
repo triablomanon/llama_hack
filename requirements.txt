@@ -1,2 +1,3 @@
 llama_api_client
 python-dotenv
+PyYAML
