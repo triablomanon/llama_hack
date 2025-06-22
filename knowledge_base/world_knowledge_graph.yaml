@@ -1,0 +1,106 @@
+book_info:
+  title: Harry Potter and the Sorcerer's Stone
+  author: J.K. Rowling
+  publication_year: '1997'
+  genre: Fantasy
+  themes:
+  - Friendship
+  - Courage
+  - Good vs. Evil
+  tone_and_style: Immersive, descriptive, and engaging narrative with a mix of adventure,
+    magic, and coming-of-age themes.
+  narrative_point_of_view: Third-person limited, primarily focusing on Harry Potter's
+    perspective.
+  summary: The story follows Harry Potter, an orphan boy who discovers he is a wizard,
+    as he begins attending Hogwarts School of Witchcraft and Wizardry. Harry must
+    navigate the magical world, make new friends, and confront the dark wizard, Lord
+    Voldemort, who murdered his parents and seeks to return to power.
+  intended_audience: Children and young adults, although the series has appealed to
+    readers of all ages.
+characters:
+- name: Harry Potter
+  aliases:
+  - The Boy Who Lived
+  description: The protagonist, an orphan boy who discovers he is a wizard and begins
+    attending Hogwarts School of Witchcraft and Wizardry.
+  roles:
+  - Student
+  - Seeker
+  traits:
+  - Brave
+  - Loyal
+  - Determined
+  skills_or_powers:
+  - Magic
+  - Flying on broomsticks
+  items:
+  - Invisibility cloak
+  - Nimbus Two Thousand broomstick
+  motivations: To uncover the truth about his parents and the Sorcerer's Stone, to
+    protect his friends and the wizarding world from Voldemort.
+  arc: Harry's journey from an uncertain, neglected boy to a confident, heroic young
+    wizard.
+  relationships:
+  - with: Ron Weasley
+    label: Friend
+    details: Ron and Harry become fast friends on the Hogwarts Express and share many
+      adventures together.
+    history: They met on the Hogwarts Express on their way to their first year at
+      Hogwarts.
+    quotes:
+    - '"You''re a lot braver than I thought you''d be, Harry." (Ron, after their first
+      flying lesson)'
+    - '"We''ve got to be careful, Harry. Snape''s not a nice man." (Ron, warning Harry
+      about Snape)'
+  - with: Hermione Granger
+    label: Friend
+    details: Hermione is a brilliant student who becomes one of Harry's closest friends
+      and helps him in his quest to uncover the truth about the Sorcerer's Stone.
+    history: They met on the Hogwarts Express and became friends as they navigated
+      their first year at Hogwarts together.
+    quotes:
+    - '"You''re a great wizard, Harry." (Hermione, praising Harry after he retrieves
+      the Sorcerer''s Stone)'
+    - '"We make a good team, don''t we?" (Hermione, reflecting on their friendship)'
+  quotes:
+  - '"I''ll be back." (Harry, to his parents'' reflections in the Mirror of Erised)'
+  - '"Expelliarmus!" (Harry, during his duel with Draco Malfoy)'
+storyline:
+  main_events:
+  - event: Harry discovers he's a wizard and begins attending Hogwarts School of Witchcraft
+      and Wizardry.
+    quotes:
+    - '"You''re a wizard, Harry!" (Hagrid, revealing Harry''s true identity)'
+    - '"Welcome to Hogwarts!" (Professor McGonagall, greeting Harry on his first day)'
+    details: Harry receives his acceptance letter, meets Hagrid, and discovers the
+      wizarding world. He then boards the Hogwarts Express and meets Ron and Hermione.
+  - event: Harry, Ron, and Hermione navigate the challenges of their first year at
+      Hogwarts, including learning magic, navigating the complexities of friendship,
+      and confronting the dark wizard, Lord Voldemort.
+    quotes:
+    - '"We''re not going to let you get away with it, Malfoy!" (Ron, standing up to
+      Malfoy)'
+    - '"You''re not going to use magic to bully us, are you?" (Hermione, confronting
+      Draco Malfoy)'
+    details: The trio becomes entangled in a mystery surrounding the Sorcerer's Stone
+      and must work together to prevent Voldemort's return to power.
+  timeline:
+  - The story begins with Harry living with his cruel Muggle relatives, the Dursleys.
+  - Harry discovers he's a wizard and begins attending Hogwarts.
+  - Throughout the year, Harry, Ron, and Hermione navigate the challenges of Hogwarts
+    and confront Voldemort.
+  locations:
+  - Hogwarts School of Witchcraft and Wizardry
+  - Privet Drive
+  - Diagon Alley
+  - The Forbidden Forest
+  foreshadowing:
+  - The presence of the three-headed dog, Fluffy, foreshadows the danger and mystery
+    surrounding the Sorcerer's Stone.
+  - The strange occurrences and rumors about Voldemort's return foreshadow the ultimate
+    confrontation.
+  motifs_symbols:
+  - The Sorcerer's Stone represents the power and temptation of immortality.
+  - The Mirror of Erised symbolizes the deepest desires of those who look into it.
+  narrative_tension: The story is driven by the conflict between Harry and Voldemort,
+    with the fate of the wizarding world hanging in the balance.

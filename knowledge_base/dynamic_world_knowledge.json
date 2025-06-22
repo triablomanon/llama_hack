@@ -1,275 +1,192 @@
 {
   "user": {
     "language": "English",
-    "character_played": "Harry Potter"
+    "character_played": "Lord Voldemort"
   },
   "user_specific_knowledge_graph": {
     "characters": [
       {
         "name": "Harry Potter",
-        "talking_style": "Informal, enthusiastic, and sometimes sarcastic",
-        "personality_traits": [
-          "Brave",
+        "aliases": [
+          "The Boy Who Lived"
+        ],
+        "description": "Harry is an orphan boy who discovers he is a wizard. He is brave, loyal, and determined.",
+        "roles": [
+          "Protagonist"
+        ],
+        "traits": [
+          "Courageous",
           "Loyal",
           "Determined"
         ],
         "skills_or_powers": [
-          "Magic",
-          "Flying on broomsticks"
-        ],
-        "items": [
-          "Invisibility cloak",
-          "Wand"
-        ],
-        "backstory": "Orphaned as a baby, raised by the Dursleys",
-        "objective_motivations": "To uncover the truth about his parents and the Sorcerer's Stone",
-        "factions_affiliations": [
-          "Gryffindor house"
-        ],
-        "character_arc": "From an uncertain boy to a confident young wizard",
-        "emotional_state_trends": "Initially anxious and uncertain, becomes more confident and determined",
-        "signature_quotes": [
-          "I'll be famous",
-          "Expelliarmus!"
-        ]
-      },
-      {
-        "name": "Ron Weasley",
-        "talking_style": "Witty, sarcastic, and loyal",
-        "personality_traits": [
-          "Loyal",
-          "Good-humored",
-          "Sometimes insecure"
-        ],
-        "skills_or_powers": [
-          "Magic",
-          "Wizard chess"
-        ],
-        "items": [
-          "Wand"
-        ],
-        "backstory": "Comes from a large, loving wizarding family",
-        "objective_motivations": "To support Harry and Hermione, and to prove himself",
-        "factions_affiliations": [
-          "Gryffindor house"
-        ],
-        "character_arc": "Grows in confidence and becomes a trusted friend",
-        "emotional_state_trends": "Initially nervous, becomes more confident and supportive",
-        "signature_quotes": [
-          "Blimey!",
-          "You're mental, Harry!"
-        ]
-      },
-      {
-        "name": "Hermione Granger",
-        "talking_style": "Intelligent, resourceful, and sometimes bossy",
-        "personality_traits": [
-          "Intelligent",
-          "Resourceful",
-          "Perfectionistic"
-        ],
-        "skills_or_powers": [
-          "Magic",
-          "Quick thinking"
+          "Magic"
         ],
         "items": [
           "Wand",
-          "Books and notes"
+          "Invisibility cloak"
         ],
-        "backstory": "Muggle-born, eager to prove herself",
-        "objective_motivations": "To help Harry and Ron, and to excel academically",
-        "factions_affiliations": [
-          "Gryffindor house"
+        "motivations": "To uncover the truth about his parents and the Sorcerer's Stone",
+        "arc": "Harry's journey from an unknown orphan to a celebrated wizard",
+        "relationships": [
+          {
+            "with": "Ron Weasley",
+            "label": "Friend",
+            "details": "Ron and Harry become fast friends on the Hogwarts Express. They share a deep bond and work together to overcome challenges.",
+            "history": "Met on the Hogwarts Express",
+            "quotes": "Ron: 'You're a lot braver than I am, Harry.'"
+          },
+          {
+            "with": "Hermione Granger",
+            "label": "Friend",
+            "details": "Hermione is a brilliant student who helps Harry and Ron in their quest. She is resourceful and quick-thinking.",
+            "history": "Met on the Hogwarts Express",
+            "quotes": "Hermione: 'We've got to be careful, we've got to think this through.'"
+          }
         ],
-        "character_arc": "Grows in confidence and becomes a valuable friend",
-        "emotional_state_trends": "Initially anxious, becomes more confident and determined",
-        "signature_quotes": [
-          "I've got it!",
-          "We can't just sit here and do nothing!"
-        ]
+        "quotes": "Harry: 'I'll face whatever is coming, I'll face it alone if I have to.'"
       },
       {
         "name": "Lord Voldemort",
-        "talking_style": "Cold, menacing, and manipulative",
-        "personality_traits": [
-          "Evil",
+        "aliases": [
+          "You-Know-Who",
+          "Tom Riddle"
+        ],
+        "description": "Voldemort is a dark wizard who murdered Harry's parents and seeks to return to power.",
+        "roles": [
+          "Antagonist"
+        ],
+        "traits": [
           "Power-hungry",
-          "Ruthless"
+          "Ruthless",
+          "Manipulative"
         ],
         "skills_or_powers": [
-          "Dark magic",
-          "Manipulation"
+          "Dark magic"
         ],
         "items": [
           "Wand"
         ],
-        "backstory": "Formerly Tom Riddle, a dark wizard who seeks immortality",
-        "objective_motivations": "To obtain the Sorcerer's Stone and achieve immortality",
-        "factions_affiliations": [
-          "None, but has followers known as Death Eaters"
+        "motivations": "To regain his physical form and dominate the wizarding world",
+        "arc": "Voldemort's backstory and motivations are slowly revealed throughout the story",
+        "relationships": [
+          {
+            "with": "Harry Potter",
+            "label": "Enemy",
+            "details": "Voldemort is the primary antagonist of the story, and his actions are driven by a desire to eliminate Harry.",
+            "history": "Murdered Harry's parents",
+            "quotes": "Voldemort: 'Avada Kedavra!'"
+          }
         ],
-        "character_arc": "Remains the main antagonist throughout the story",
-        "emotional_state_trends": "Consistently evil and menacing",
-        "signature_quotes": [
-          "Avada Kedavra!",
-          "You will be cursed forever"
-        ]
+        "quotes": "Voldemort: 'There is no good and evil, there is only power.'"
       }
     ],
-    "relationships": [
-      {
-        "character_a": "Harry Potter",
-        "character_b": "Ron Weasley",
-        "relationship_type": "Friendship",
-        "history": "Met on the Hogwarts Express",
-        "current_dynamic": "Close friends, supportive of each other"
-      },
-      {
-        "character_a": "Harry Potter",
-        "character_b": "Hermione Granger",
-        "relationship_type": "Friendship",
-        "history": "Met on the Hogwarts Express",
-        "current_dynamic": "Close friends, Hermione often helps Harry and Ron"
-      },
-      {
-        "character_a": "Harry Potter",
-        "character_b": "Lord Voldemort",
-        "relationship_type": "Enemy",
-        "history": "Voldemort killed Harry's parents and seeks to kill Harry",
-        "current_dynamic": "Voldemort is the main antagonist, Harry is determined to stop him"
-      }
-    ],
+    "relationships": [],
     "skills_or_powers": [
       [
-        "Magic",
-        "Flying on broomsticks"
+        "Magic"
       ],
       [
-        "Magic",
-        "Wizard chess"
-      ],
-      [
-        "Magic",
-        "Quick thinking"
-      ],
-      [
-        "Dark magic",
-        "Manipulation"
+        "Dark magic"
       ]
     ],
     "items": [
       [
-        "Invisibility cloak",
-        "Wand"
-      ],
-      [
-        "Wand"
-      ],
-      [
         "Wand",
-        "Books and notes"
+        "Invisibility cloak"
       ],
       [
         "Wand"
       ]
     ],
     "factions_affiliations": [
-      [
-        "Gryffindor house"
-      ],
-      [
-        "Gryffindor house"
-      ],
-      [
-        "Gryffindor house"
-      ],
-      [
-        "None, but has followers known as Death Eaters"
-      ]
+      [],
+      []
     ],
     "character_arcs": [
-      "From an uncertain boy to a confident young wizard",
-      "Grows in confidence and becomes a trusted friend",
-      "Grows in confidence and becomes a valuable friend",
-      "Remains the main antagonist throughout the story"
+      "",
+      ""
     ],
     "emotional_state_trends": [
-      "Initially anxious and uncertain, becomes more confident and determined",
-      "Initially nervous, becomes more confident and supportive",
-      "Initially anxious, becomes more confident and determined",
-      "Consistently evil and menacing"
+      "",
+      ""
     ],
     "storyline": {
       "main_events": [
-        "Harry discovers he's a wizard and begins attending Hogwarts",
-        "Harry, Ron, and Hermione become friends and navigate the challenges of Hogwarts",
-        "They uncover a plot by Voldemort to obtain the Sorcerer's Stone",
-        "The trio works together to prevent Voldemort from achieving his goal"
+        {
+          "event": "Harry discovers he is a wizard",
+          "quotes": "Hagrid: 'Yeh're a wizard, Harry!'",
+          "details": "Harry receives a letter from Hogwarts and meets Hagrid, who reveals his true identity as a wizard."
+        },
+        {
+          "event": "Harry attends Hogwarts School of Witchcraft and Wizardry",
+          "quotes": "Dumbledore: 'Welcome to Hogwarts, Harry!'",
+          "details": "Harry makes friends with Ron and Hermione and becomes entangled in a mystery surrounding the Sorcerer's Stone."
+        },
+        {
+          "event": "Harry, Ron, and Hermione thwart Voldemort's plan to obtain the Sorcerer's Stone",
+          "quotes": "Harry: 'I'll face whatever is coming, I'll face it alone if I have to.'",
+          "details": "The trio navigates obstacles and challenges to prevent Voldemort from obtaining the Stone."
+        }
+      ],
+      "timeline": [
+        "The story begins with Harry living with his cruel Muggle relatives, the Dursleys.",
+        "Harry receives a letter from Hogwarts and discovers he is a wizard.",
+        "Harry attends Hogwarts and makes friends with Ron and Hermione.",
+        "The trio becomes entangled in a mystery surrounding the Sorcerer's Stone.",
+        "They thwart Voldemort's plan to obtain the Stone."
       ],
       "locations": [
         "Hogwarts School of Witchcraft and Wizardry",
         "Diagon Alley",
-        "The Forbidden Forest"
+        "The Dursleys' home"
       ],
-      "conflict_points": [
-        "Harry's struggles to adjust to being a wizard",
-        "The danger posed by Voldemort",
-        "The challenges of navigating Hogwarts"
-      ],
-      "timeline": [
-        "The story takes place over the course of a year, from Harry's eleventh birthday to the end of the school year"
-      ],
-      "foreshadowing_elements": [
+      "foreshadowing": [
         "The mysterious events surrounding the Sorcerer's Stone",
         "The sinister presence of Voldemort"
       ],
-      "recurring_motifs_symbols": [
-        "The struggle between good and evil",
-        "The power of friendship and loyalty"
+      "motifs_symbols": [
+        "The Sorcerer's Stone represents power and temptation",
+        "The mirror of Erised represents the danger of desire and the importance of self-control"
       ],
-      "narrative_tension_points": [
-        "The Quidditch match between Gryffindor and Slytherin",
-        "The final confrontation with Voldemort"
-      ],
-      "parallel_storylines": [
-        "The story of Nicolas Flamel and the Sorcerer's Stone",
-        "The subplot involving Quirrell and Voldemort"
+      "narrative_tension": [
+        "The conflict between good and evil",
+        "The challenges and obstacles faced by Harry, Ron, and Hermione"
       ]
     },
     "main_events": [
-      "Harry discovers he's a wizard and begins attending Hogwarts",
-      "Harry, Ron, and Hermione become friends and navigate the challenges of Hogwarts",
-      "They uncover a plot by Voldemort to obtain the Sorcerer's Stone",
-      "The trio works together to prevent Voldemort from achieving his goal"
+      {
+        "event": "Harry discovers he is a wizard",
+        "quotes": "Hagrid: 'Yeh're a wizard, Harry!'",
+        "details": "Harry receives a letter from Hogwarts and meets Hagrid, who reveals his true identity as a wizard."
+      },
+      {
+        "event": "Harry attends Hogwarts School of Witchcraft and Wizardry",
+        "quotes": "Dumbledore: 'Welcome to Hogwarts, Harry!'",
+        "details": "Harry makes friends with Ron and Hermione and becomes entangled in a mystery surrounding the Sorcerer's Stone."
+      },
+      {
+        "event": "Harry, Ron, and Hermione thwart Voldemort's plan to obtain the Sorcerer's Stone",
+        "quotes": "Harry: 'I'll face whatever is coming, I'll face it alone if I have to.'",
+        "details": "The trio navigates obstacles and challenges to prevent Voldemort from obtaining the Stone."
+      }
     ],
     "locations": [
       "Hogwarts School of Witchcraft and Wizardry",
       "Diagon Alley",
-      "The Forbidden Forest"
+      "The Dursleys' home"
     ],
-    "conflict_points": [
-      "Harry's struggles to adjust to being a wizard",
-      "The danger posed by Voldemort",
-      "The challenges of navigating Hogwarts"
-    ],
+    "conflict_points": [],
     "timeline": [
-      "The story takes place over the course of a year, from Harry's eleventh birthday to the end of the school year"
+      "The story begins with Harry living with his cruel Muggle relatives, the Dursleys.",
+      "Harry receives a letter from Hogwarts and discovers he is a wizard.",
+      "Harry attends Hogwarts and makes friends with Ron and Hermione.",
+      "The trio becomes entangled in a mystery surrounding the Sorcerer's Stone.",
+      "They thwart Voldemort's plan to obtain the Stone."
     ],
-    "foreshadowing_elements": [
-      "The mysterious events surrounding the Sorcerer's Stone",
-      "The sinister presence of Voldemort"
-    ],
-    "recurring_motifs_symbols": [
-      "The struggle between good and evil",
-      "The power of friendship and loyalty"
-    ],
-    "narrative_tension_points": [
-      "The Quidditch match between Gryffindor and Slytherin",
-      "The final confrontation with Voldemort"
-    ],
-    "parallel_storylines": [
-      "The story of Nicolas Flamel and the Sorcerer's Stone",
-      "The subplot involving Quirrell and Voldemort"
-    ]
+    "foreshadowing_elements": [],
+    "recurring_motifs_symbols": [],
+    "narrative_tension_points": [],
+    "parallel_storylines": []
   }
 }
