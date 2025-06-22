@@ -2,6 +2,10 @@ import json
 import os
 from typing import Dict, List, Any, Optional
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 class StoryGenerator:
     def __init__(self, dynamic_knowledge_path: str = "knowledge_base/dynamic_world_knowledge.json"):
@@ -71,8 +75,68 @@ class StoryGenerator:
         
         return context
     
-    def generate_next_story_segment(self, user_response: str, current_character: str, consequences: Dict[str, Any]) -> str:
-        """Generate the next story segment based on user response and consequences"""
+    def generate_story_segment_with_api(self, user_response: str, current_character: str, consequences: Dict[str, Any]) -> str:
+        """Generate story segment using API for more creative and dynamic content"""
+        try:
+            from llama_api_client import LlamaAPIClient
+            
+            # Setup client
+            client = LlamaAPIClient(
+                api_key=os.environ.get("LLAMA_API_KEY"),
+            )
+            
+            # Get current story context
+            characters = self.dynamic_knowledge.get("user_specific_knowledge_graph", {}).get("characters", [])
+            storyline = self.dynamic_knowledge.get("user_specific_knowledge_graph", {}).get("storyline", {})
+            
+            # Create prompt for story generation
+            prompt = f"""
+            Generate the next story segment based on the user's response and the current story context.
+            
+            User Response: "{user_response}"
+            Current Character: {current_character}
+            
+            Character Information:
+            {json.dumps([c for c in characters if c.get('name') == current_character], indent=2)}
+            
+            Consequences Analysis:
+            {json.dumps(consequences, indent=2)}
+            
+            Current Story Context:
+            {json.dumps(storyline, indent=2)}
+            
+            Please generate a compelling story segment that:
+            1. Responds to the user's action naturally
+            2. Shows the consequences of their choice
+            3. Advances the story in an interesting way
+            4. Maintains character consistency
+            5. Creates tension or opportunity for the next choice
+            
+            Write in a narrative style that immerses the reader in the story.
+            Keep it to 2-3 paragraphs maximum.
+            """
+            
+            # Make API call
+            completion = client.chat.completions.create(
+                model="Llama-4-Maverick-17B-128E-Instruct-FP8",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ]
+            )
+            
+            story_segment = completion.completion_message.content.text
+            return story_segment.strip()
+            
+        except Exception as e:
+            print(f"API story generation failed: {e}")
+            print("Falling back to template-based generation...")
+            return self.generate_next_story_segment_template(user_response, current_character, consequences)
+
+    def generate_next_story_segment_template(self, user_response: str, current_character: str, consequences: Dict[str, Any]) -> str:
+        """Fallback template-based story generation when API is not available"""
         story_direction = consequences.get("story_direction", "")
         emotional_impact = consequences.get("emotional_impact", "")
         

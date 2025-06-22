@@ -74,7 +74,7 @@ What would you like to do?
         consequences = self.updater.update_based_on_user_response(user_input, self.current_character)
         
         # Generate next story segment
-        next_story = self.generator.generate_next_story_segment(user_input, self.current_character, consequences)
+        next_story = self.generator.generate_story_segment_with_api(user_input, self.current_character, consequences)
         
         # Add story response to history
         self.conversation_history.append({

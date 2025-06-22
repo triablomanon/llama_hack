@@ -2,6 +2,10 @@ import json
 import os
 from typing import Dict, List, Any
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 class DynamicKnowledgeUpdater:
     def __init__(self, dynamic_knowledge_path: str = "knowledge_base/dynamic_world_knowledge.json"):
@@ -105,9 +109,86 @@ class DynamicKnowledgeUpdater:
         
         self.dynamic_knowledge["alternative_endings"].append(new_branch)
     
-    def analyze_user_response(self, user_response: str, current_character: str) -> Dict[str, Any]:
-        """Analyze user response and determine consequences"""
-        # This is a simplified analysis - in a real implementation, you might use AI to analyze
+    def analyze_user_response_with_api(self, user_response: str, current_character: str, world_context: dict) -> Dict[str, Any]:
+        """Analyze user response using API for more sophisticated understanding"""
+        try:
+            from llama_api_client import LlamaAPIClient
+            
+            # Setup client
+            client = LlamaAPIClient(
+                api_key=os.environ.get("LLAMA_API_KEY"),
+            )
+            
+            # Create prompt for response analysis
+            prompt = f"""
+            Analyze this user response in the context of the story world and character.
+            
+            User Response: "{user_response}"
+            Current Character: {current_character}
+            
+            World Context:
+            {json.dumps(world_context, indent=2)}
+            
+            Please analyze the user's response and provide:
+            1. Emotional impact on the character
+            2. Character development implications
+            3. Story direction (conflict/heroic/survival/diplomatic/other)
+            4. Items gained or lost
+            5. Relationship changes
+            6. Narrative consequences
+            
+            Return the analysis in this JSON format:
+            {{
+                "emotional_impact": "description of emotional change",
+                "arc_development": "description of character development",
+                "story_direction": "conflict/heroic/survival/diplomatic/other",
+                "items_gained": ["item1", "item2"],
+                "items_lost": ["item1"],
+                "relationship_changes": ["description of relationship changes"],
+                "narrative_consequences": "description of story implications"
+            }}
+            """
+            
+            # Make API call
+            completion = client.chat.completions.create(
+                model="Llama-4-Maverick-17B-128E-Instruct-FP8",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ]
+            )
+            
+            raw_response = completion.completion_message.content.text
+            
+            # Parse JSON response
+            start = raw_response.find("{")
+            end = raw_response.rfind("}")
+            json_str = raw_response[start:end+1] if start != -1 and end != -1 else raw_response
+            
+            api_analysis = json.loads(json_str)
+            
+            # Convert to expected format
+            consequences = {
+                "emotional_impact": api_analysis.get("emotional_impact", ""),
+                "arc_development": api_analysis.get("arc_development", ""),
+                "items_gained": api_analysis.get("items_gained", []),
+                "items_lost": api_analysis.get("items_lost", []),
+                "relationship_changes": api_analysis.get("relationship_changes", []),
+                "story_direction": api_analysis.get("story_direction", ""),
+                "narrative_consequences": api_analysis.get("narrative_consequences", "")
+            }
+            
+            return consequences
+            
+        except Exception as e:
+            print(f"API analysis failed: {e}")
+            print("Falling back to keyword-based analysis...")
+            return self.analyze_user_response_keyword(user_response, current_character)
+
+    def analyze_user_response_keyword(self, user_response: str, current_character: str) -> Dict[str, Any]:
+        """Fallback keyword-based analysis when API is not available"""
         consequences = {
             "emotional_impact": "",
             "arc_development": "",
@@ -144,8 +225,15 @@ class DynamicKnowledgeUpdater:
     
     def update_based_on_user_response(self, user_response: str, current_character: str):
         """Main method to update dynamic knowledge based on user response"""
-        # Analyze the response
-        consequences = self.analyze_user_response(user_response, current_character)
+        # Create world context for API analysis
+        world_context = {
+            "characters": self.dynamic_knowledge.get("user_specific_knowledge_graph", {}).get("characters", []),
+            "storyline": self.dynamic_knowledge.get("user_specific_knowledge_graph", {}).get("storyline", {}),
+            "relationships": self.dynamic_knowledge.get("user_specific_knowledge_graph", {}).get("relationships", [])
+        }
+        
+        # Analyze the response using API
+        consequences = self.analyze_user_response_with_api(user_response, current_character, world_context)
         
         # Update character state
         self.update_character_state(current_character, user_response, consequences)
