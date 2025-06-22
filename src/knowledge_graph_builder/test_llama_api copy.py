@@ -1,7 +1,8 @@
 import os
 import json
 from dotenv import load_dotenv
-from llama_api_client import LlamaAPIClient
+import llama_cpp
+import llama
 
 # 1. Load environment variables
 load_dotenv()
