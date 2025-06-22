@@ -1,0 +1,238 @@
+/* General styles */
+body {
+    font-family: 'Georgia', serif;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.hogwarts-bg {
+    background-image: url('/static/images/hogwarts_bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Sidebar styles */
+.sidebar {
+    background-color: rgba(25, 25, 25, 0.9);
+    color: #f0f0f0;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+}
+
+.character-card {
+    background-color: rgba(70, 70, 70, 0.7);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: transform 0.2s;
+}
+
+.character-card:hover {
+    transform: translateY(-2px);
+}
+
+.character-card.selected {
+    border-left: 4px solid #ffc107;
+    background-color: rgba(100, 100, 100, 0.7);
+}
+
+.character-name {
+    font-weight: bold;
+    color: #ffc107;
+}
+
+.world-info {
+    background-color: rgba(50, 50, 50, 0.7);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.accordion-button {
+    background-color: rgba(70, 70, 70, 0.7);
+    color: #f0f0f0;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: rgba(100, 100, 100, 0.7);
+    color: #ffc107;
+}
+
+.accordion-body {
+    background-color: rgba(40, 40, 40, 0.7);
+    color: #f0f0f0;
+}
+
+/* Chat area styles */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: rgba(240, 240, 240, 0.7);
+}
+
+.chat-header {
+    background-color: rgba(121, 22, 15, 0.9);
+    color: #f0f0f0;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    max-width: 80%;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.user-message {
+    align-self: flex-end;
+}
+
+.character-message {
+    align-self: flex-start;
+}
+
+.message-content {
+    padding: 12px 15px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.user-message .message-content {
+    background-color: #4a66a0;
+    color: white;
+    border-bottom-right-radius: 0;
+}
+
+.character-message .message-content {
+    background-color: #9c1203;
+    color: white;
+    border-bottom-left-radius: 0;
+}
+
+.message-text {
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
+
+.system-message {
+    align-self: center;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 90%;
+    font-style: italic;
+    margin: 5px 0;
+}
+
+.system-message.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.system-message.update {
+    background-color: rgba(25, 135, 84, 0.2);
+    color: #198754;
+}
+
+.chat-input {
+    padding: 15px;
+    background-color: rgba(240, 240, 240, 0.8);
+    border-top: 1px solid #ddd;
+}
+
+.chat-input .form-control {
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.chat-input .btn-primary {
+    background-color: #9c1203;
+    border-color: #7d0f02;
+}
+
+.chat-input .btn-primary:hover {
+    background-color: #7d0f02;
+    border-color: #5e0b01;
+}
+
+/* Loading animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+}
+
+.typing-indicator span {
+    height: 10px;
+    width: 10px;
+    float: left;
+    margin: 0 1px;
+    background-color: #9E9E9E;
+    display: block;
+    border-radius: 50%;
+    opacity: 0.4;
+}
+
+.typing-indicator span:nth-of-type(1) {
+    animation: 1s blink infinite 0.3333s;
+}
+
+.typing-indicator span:nth-of-type(2) {
+    animation: 1s blink infinite 0.6666s;
+}
+
+.typing-indicator span:nth-of-type(3) {
+    animation: 1s blink infinite 0.9999s;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Setup page styles */
+.setup-card {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 30px;
+    margin-top: 50px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.setup-steps {
+    margin: 25px 0;
+}
+
+.setup-steps li {
+    margin-bottom: 20px;
+}
+
+.setup-steps pre {
+    background-color: #272822;
+    color: #f8f8f2;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+}

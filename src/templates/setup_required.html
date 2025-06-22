@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Setup - Interactive Story Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+      :root {
+        --primary-color: #212121;
+        --secondary-color: #757575;
+        --background-color: #ffffff;
+        --surface-color: #fafafa;
+        --divider-color: #e0e0e0;
+        --error-color: #b00020;
+        --success-color: #28a745;
+        --text-primary: #212121;
+        --text-secondary: #757575;
+        --elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        --elevation-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        --border-radius: 4px;
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .setup-card {
+        background-color: var(--background-color);
+        padding: 25px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--elevation-1);
+        margin-top: 20px;
+        max-width: 800px;
+        width: 100%;
+      }
+      pre {
+        background-color: #272822;
+        color: #f8f8f2;
+        padding: 15px;
+        border-radius: var(--border-radius);
+        overflow-x: auto;
+      }
+      
+      h1 {
+        color: var(--primary-color);
+        font-size: 24px;
+        margin-bottom: 16px;
+        font-weight: 500;
+      }
+      
+      h2 {
+        color: var(--primary-color);
+        margin-top: 30px;
+        font-size: 20px;
+        font-weight: 500;
+      }
+      
+      h3 {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+      }
+      
+      p {
+        margin-bottom: 16px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+      }
+      .btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
+        text-transform: uppercase;
+        transition: background-color 0.2s;
+      }
+      
+      .btn:hover {
+        background-color: #000;
+      }
+      
+      .btn:disabled {
+        background-color: var(--divider-color);
+        cursor: not-allowed;
+        color: var(--text-secondary);
+      }
+      .upload-section {
+        background-color: var(--surface-color);
+        border: 1px dashed var(--divider-color);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+      }
+      
+      .upload-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      
+      input[type="file"] {
+        margin-bottom: 16px;
+        padding: 8px;
+        border: 1px solid var(--divider-color);
+        border-radius: var(--border-radius);
+        width: 100%;
+      }
+      .or-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 20px 0;
+        color: #666;
+      }
+      .or-divider::before,
+      .or-divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+      }
+      .or-divider::before {
+        margin-right: 10px;
+      }
+      .or-divider::after {
+        margin-left: 10px;
+      }
+      .status {
+        padding: 12px;
+        margin-top: 16px;
+        border-radius: var(--border-radius);
+        display: none;
+        font-size: 14px;
+      }
+      
+      .success {
+        background-color: var(--success-color);
+        color: white;
+      }
+      
+      .error {
+        background-color: var(--error-color);
+        color: white;
+      }
+      .character-selection {
+        margin-top: 20px;
+        display: none;
+        background-color: var(--surface-color);
+        border: 1px solid var(--divider-color);
+        padding: 20px;
+        border-radius: var(--border-radius);
+      }
+      
+      .character-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      
+      .character-card {
+        background-color: var(--background-color);
+        border: 1px solid var(--divider-color);
+        border-radius: var(--border-radius);
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .character-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--elevation-1);
+      }
+      
+      .character-card.selected {
+        background-color: var(--surface-color);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px var(--primary-color);
+      }
+      
+      .character-name {
+        font-weight: 500;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+      }
+      
+      .character-traits {
+        font-size: 0.9em;
+        color: var(--text-secondary);
+      }
+      .language-section {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      
+      select, .character-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--divider-color);
+        border-radius: var(--border-radius);
+        background-color: var(--background-color);
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+        color: var(--text-primary);
+        margin-top: 8px;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23757575%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 12px;
+      }
+      
+      select:focus, .character-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
+      
+      label {
+        color: var(--text-secondary);
+        font-size: 14px;
+      }
+      
+      .step-indicator {
+        background-color: var(--surface-color);
+        color: var(--text-secondary);
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        display: inline-block;
+        margin-right: 10px;
+        border: 1px solid var(--divider-color);
+      }
+      
+      .step-completed {
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+      }
+      
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .setup-card {
+          padding: 20px;
+          margin: 10px;
+        }
+        
+        h1 {
+          font-size: 20px;
+        }
+        
+        h2 {
+          font-size: 18px;
+        }
+        
+        .character-grid {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+      }
+      
+      /* Small mobile devices */
+      @media (max-width: 480px) {
+        .setup-card {
+          padding: 15px;
+          margin: 5px;
+        }
+        
+        .btn {
+          padding: 8px 16px;
+          font-size: 12px;
+          width: 100%;
+          margin-top: 8px;
+        }
+        
+        input[type="file"] {
+          font-size: 12px;
+        }
+        
+        .character-grid {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          max-height: 300px;
+        }
+        
+        .upload-section, .character-selection {
+          padding: 15px;
+        }
+        
+        h3 {
+          font-size: 14px;
+        }
+        
+        p {
+          font-size: 14px;
+        }
+        
+        .step-indicator {
+          font-size: 12px;
+          padding: 4px 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="setup-card">
+      <h1>Interactive Story Chat Setup</h1>
+      <p>
+        Before you can chat with characters from your chosen story, you
+        need to complete the setup process:
+      </p>
+
+      <div class="setup-steps">
+        <div>
+          <h2>
+            <span class="step-indicator" id="step1-indicator">Step 1</span>
+            Generate Knowledge Graph
+          </h2>
+          <p>
+            Choose one of the following options to create the knowledge graph:
+          </p>
+
+          <div class="upload-section">
+            <div class="upload-title">
+              <h3>Upload a File</h3>
+            </div>
+            <p>Upload your story text or other source material:</p>
+            <form id="uploadForm" enctype="multipart/form-data">
+              <input type="file" id="bookFile" name="bookFile" accept=".txt" />
+              <button type="submit" class="btn">
+                Upload & Generate Knowledge Graph
+              </button>
+            </form>
+            <div id="uploadStatus" class="status"></div>
+          </div>
+
+          <div class="or-divider">OR</div>
+
+          <div>
+            <h3>Use Built-in Data</h3>
+            <p>Use the pre-installed story text file:</p>
+            <button id="generateButton" class="btn">
+              Generate Knowledge Graph
+            </button>
+            <div id="generateStatus" class="status"></div>
+          </div>
+        </div>
+
+        <div>
+          <h2>
+            <span class="step-indicator" id="step2-indicator">Step 2</span>
+            Choose Your Character
+          </h2>
+          <p>Select which character you want to play as in the game:</p>
+
+          <div id="characterSelectionContainer" class="character-selection">
+            <div class="language-section">
+              <label for="languageSelect">
+                Select your preferred language:
+              </label>
+              <select id="languageSelect" class="character-select">
+                <option value="English">English</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Chinese">Chinese</option>
+              </select>
+            </div>
+
+            <h3>Available Characters:</h3>
+            <div id="characterGrid" class="character-grid">
+              <div class="character-card character-loading">
+                Loading characters...
+              </div>
+            </div>
+
+            <button
+              id="saveCharacterButton"
+              class="btn"
+              style="margin-top: 20px"
+              disabled
+            >
+              Save Character Selection
+            </button>
+          </div>
+
+          <button id="characterButton" class="btn">
+            View Available Characters
+          </button>
+          <div id="characterStatus" class="status"></div>
+        </div>
+
+        <div style="margin-top: 40px">
+          <h2>
+            <span class="step-indicator" id="step3-indicator">Step 3</span>
+            Start Chat
+          </h2>
+          <p>Once you've selected a character, you can start chatting:</p>
+          <button id="startChatButton" class="btn" disabled>Start Chat</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const uploadForm = document.getElementById("uploadForm");
+        const generateButton = document.getElementById("generateButton");
+        const characterButton = document.getElementById("characterButton");
+        const characterSelectionContainer = document.getElementById(
+          "characterSelectionContainer"
+        );
+        const characterGrid = document.getElementById("characterGrid");
+        const saveCharacterButton = document.getElementById(
+          "saveCharacterButton"
+        );
+        const startChatButton = document.getElementById("startChatButton");
+        const languageSelect = document.getElementById("languageSelect");
+
+        const uploadStatus = document.getElementById("uploadStatus");
+        const generateStatus = document.getElementById("generateStatus");
+        const characterStatus = document.getElementById("characterStatus");
+
+        const step1Indicator = document.getElementById("step1-indicator");
+        const step2Indicator = document.getElementById("step2-indicator");
+        const step3Indicator = document.getElementById("step3-indicator");
+
+        let selectedCharacter = null;
+
+        // Handle orientation change for mobile devices
+        window.addEventListener("orientationchange", function() {
+          // Adjust layout when orientation changes
+          setTimeout(function() {
+            // This timeout gives the browser time to complete the orientation change
+            adjustLayout();
+          }, 300);
+        });
+
+        function adjustLayout() {
+          const viewportWidth = window.innerWidth;
+          const setupCard = document.querySelector('.setup-card');
+          
+          if (viewportWidth <= 480) {
+            setupCard.style.padding = '15px';
+            setupCard.style.margin = '5px';
+          } else if (viewportWidth <= 768) {
+            setupCard.style.padding = '20px';
+            setupCard.style.margin = '10px';
+          } else {
+            setupCard.style.padding = '25px';
+            setupCard.style.margin = '20px auto';
+          }
+        }
+
+        // Adjust layout on page load
+        adjustLayout();
+        
+        // Also adjust on window resize
+        window.addEventListener('resize', adjustLayout);
+
+        // Check if knowledge graph exists
+        checkSetupStatus();
+
+        function checkSetupStatus() {
+          fetch("/api/check-setup")
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.knowledge_graph_exists) {
+                // Knowledge graph exists
+                step1Indicator.classList.add("step-completed");
+                generateStatus.textContent = "Knowledge graph already exists!";
+                generateStatus.className = "status success";
+                generateStatus.style.display = "block";
+
+                if (data.character_selected) {
+                  // Character already selected
+                  step2Indicator.classList.add("step-completed");
+                  characterStatus.textContent =
+                    "Character already selected: " + data.selected_character;
+                  characterStatus.className = "status success";
+                  characterStatus.style.display = "block";
+
+                  // Enable start chat button
+                  step3Indicator.classList.add("step-completed");
+                  startChatButton.disabled = false;
+                }
+              }
+            })
+            .catch((error) =>
+              console.error("Error checking setup status:", error)
+            );
+        }
+
+        // Upload file and generate knowledge graph
+        uploadForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const fileInput = document.getElementById("bookFile");
+          const file = fileInput.files[0];
+
+          if (!file) {
+            uploadStatus.textContent = "Please select a file first.";
+            uploadStatus.className = "status error";
+            uploadStatus.style.display = "block";
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("bookFile", file);
+
+          uploadStatus.textContent =
+            "Uploading and generating knowledge graph... This may take a few minutes.";
+          uploadStatus.className = "status";
+          uploadStatus.style.display = "block";
+
+          fetch("/api/upload-and-generate", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                uploadStatus.textContent =
+                  "Knowledge graph generated successfully!";
+                uploadStatus.className = "status success";
+                step1Indicator.classList.add("step-completed");
+                characterButton.disabled = false;
+              } else {
+                uploadStatus.textContent = "Error: " + data.error;
+                uploadStatus.className = "status error";
+              }
+            })
+            .catch((error) => {
+              uploadStatus.textContent =
+                "Error uploading file or generating knowledge graph.";
+              uploadStatus.className = "status error";
+              console.error("Error:", error);
+            });
+        });
+
+        // Generate knowledge graph with built-in data
+        generateButton.addEventListener("click", function () {
+          generateStatus.textContent =
+            "Generating knowledge graph... This may take a few minutes.";
+          generateStatus.className = "status";
+          generateStatus.style.display = "block";
+
+          fetch("/api/generate-knowledge", {
+            method: "POST",
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                generateStatus.textContent =
+                  "Knowledge graph generated successfully!";
+                generateStatus.className = "status success";
+                step1Indicator.classList.add("step-completed");
+                characterButton.disabled = false;
+              } else {
+                generateStatus.textContent = "Error: " + data.error;
+                generateStatus.className = "status error";
+              }
+            })
+            .catch((error) => {
+              generateStatus.textContent = "Error generating knowledge graph.";
+              generateStatus.className = "status error";
+              console.error("Error:", error);
+            });
+        });
+
+        // Show character selection
+        characterButton.addEventListener("click", function () {
+          // Show character selection container
+          characterSelectionContainer.style.display = "block";
+
+          // Load characters
+          loadCharacters();
+
+          // Hide the button itself
+          this.style.display = "none";
+        });
+
+        // Load characters
+        function loadCharacters() {
+          characterGrid.innerHTML =
+            '<div class="character-card character-loading">Loading characters...</div>';
+
+          fetch("/api/get-characters")
+            .then((response) => response.json())
+            .then((data) => {
+              if (
+                data.success &&
+                data.characters &&
+                data.characters.length > 0
+              ) {
+                // Display characters in grid
+                characterGrid.innerHTML = "";
+
+                data.characters.forEach((character) => {
+                  const card = document.createElement("div");
+                  card.className = "character-card";
+                  card.dataset.name = character.name;
+
+                  const traits = character.personality_traits || [];
+                  const traitsText =
+                    traits.length > 0
+                      ? traits.slice(0, 3).join(", ")
+                      : "No traits specified";
+
+                  card.innerHTML = `
+                    <div class="character-name">${character.name}</div>
+                    <div class="character-traits">${traitsText}</div>
+                  `;
+
+                  card.addEventListener("click", function () {
+                    // Remove selected class from all cards
+                    document
+                      .querySelectorAll(".character-card")
+                      .forEach((c) => {
+                        c.classList.remove("selected");
+                      });
+
+                    // Add selected class to this card
+                    this.classList.add("selected");
+
+                    // Store selected character
+                    selectedCharacter = character.name;
+
+                    // Enable save button
+                    saveCharacterButton.disabled = false;
+                  });
+
+                  characterGrid.appendChild(card);
+                });
+              } else {
+                characterGrid.innerHTML =
+                  '<div class="character-card">No characters found or error loading characters. Please generate knowledge graph first.</div>';
+              }
+            })
+            .catch((error) => {
+              characterGrid.innerHTML =
+                '<div class="character-card">Error loading characters. Please try again.</div>';
+              console.error("Error:", error);
+            });
+        }
+
+        // Save character selection
+        saveCharacterButton.addEventListener("click", function () {
+          if (!selectedCharacter) {
+            characterStatus.textContent = "Please select a character first.";
+            characterStatus.className = "status error";
+            characterStatus.style.display = "block";
+            return;
+          }
+
+          const language = languageSelect.value;
+
+          characterStatus.textContent = "Saving character selection...";
+          characterStatus.className = "status";
+          characterStatus.style.display = "block";
+
+          fetch("/api/save-character", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              character: selectedCharacter,
+              language: language,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                characterStatus.textContent = `Character selected: ${selectedCharacter}`;
+                characterStatus.className = "status success";
+                characterStatus.style.display = "block";
+                step2Indicator.classList.add("step-completed");
+                step3Indicator.classList.add("step-completed");
+
+                // Enable start chat button
+                startChatButton.disabled = false;
+              } else {
+                characterStatus.textContent =
+                  "Error: " + (data.error || "Unknown error");
+                characterStatus.className = "status error";
+                characterStatus.style.display = "block";
+              }
+            })
+            .catch((error) => {
+              characterStatus.textContent = "Error saving character selection.";
+              characterStatus.className = "status error";
+              characterStatus.style.display = "block";
+              console.error("Error:", error);
+            });
+        });
+
+        // Start chat
+        startChatButton.addEventListener("click", function () {
+          window.location.href = "/";
+        });
+      });
+    </script>
+  </body>
+</html>
