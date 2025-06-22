@@ -1,5 +1,6 @@
 import os
 import yaml
+import re
 from dotenv import load_dotenv
 
 # 1. Load environment variables
@@ -20,7 +21,7 @@ except Exception as e:
     API_AVAILABLE = False
 
 # 3. Paths
-book_path = "book_data/harrypotter.txt"  # Update as needed
+book_path = "book_data/harrypotter.txt"  # This will be the uploaded file from web
 output_path = "knowledge_base/world_knowledge_graph.yaml"
 
 # 4. Read book
@@ -32,7 +33,7 @@ with open(book_path, "r", encoding="utf-8") as f:
     book_text = f.read()
 
 def create_fallback_knowledge_graph(book_text):
-    """Create a basic knowledge graph structure when API is not available"""
+    """Create a basic knowledge graph structure from actual text analysis"""
     print("Creating fallback knowledge graph from text analysis...")
     
     # Basic analysis of the text
@@ -40,181 +41,94 @@ def create_fallback_knowledge_graph(book_text):
     title = ""
     characters = []
     
-    # Extract title
-    for line in lines:
-        if "Title:" in line:
-            title = line.split("Title:")[1].strip().replace('**', '').replace('"', '')
+    # Extract title from first few lines
+    for i, line in enumerate(lines[:10]):
+        line = line.strip()
+        if line and not line.startswith('CHAPTER') and not line.startswith('Chapter'):
+            title = line
             break
     
-    # Extract character names (improved pattern matching)
-    character_names = []
+    # Extract character names using various patterns
+    character_names = set()
+    
+    # Pattern 1: Look for capitalized names (likely character names)
     for line in lines:
-        line = line.strip()
-        # Look for character names in script format (all caps, not scene directions)
-        if (line.isupper() and 
-            len(line) > 2 and 
-            len(line) < 50 and
-            not line.startswith("INT.") and 
-            not line.startswith("EXT.") and
-            not line.startswith("MONTAGE") and
-            not line.startswith("FADE") and
-            not line.startswith("**") and
-            line not in ["DAY", "NIGHT", "MORNING", "LATER", "TEXT ON SCREEN"]):
-            # Clean up the name
-            name = line.replace('**', '').strip()
-            if name not in character_names:
-                character_names.append(name)
+        words = line.split()
+        for word in words:
+            # Clean the word
+            clean_word = re.sub(r'[^\w\s]', '', word)
+            if (len(clean_word) > 2 and 
+                clean_word[0].isupper() and 
+                clean_word[1:].islower() and
+                clean_word not in ['The', 'And', 'But', 'For', 'With', 'From', 'Into', 'During', 'Before', 'After', 'Above', 'Below', 'Between', 'Among', 'Through', 'Within', 'Without', 'Against', 'Toward', 'Towards', 'Upon', 'About', 'Around', 'Across', 'Behind', 'Beneath', 'Beside', 'Beyond', 'Inside', 'Outside', 'Under', 'Over', 'Along', 'Throughout', 'Until', 'Since', 'While', 'When', 'Where', 'Why', 'How', 'What', 'Who', 'Which', 'That', 'This', 'These', 'Those']):
+                character_names.add(clean_word)
     
-    # Manual character mapping based on the story
-    character_info = {
-        "DIEGO": {
-            "description": "A charismatic and confident intern at Chewy who leads the team to the hackathon",
-            "traits": ["charismatic", "confident", "leader", "persuasive"],
-            "skills_or_powers": ["persuasion", "idea generation", "team leadership"],
-            "items": ["whiteboard marker"],
-            "motivations": "To win the Meta Hackathon and prove his team's capabilities",
-            "arc": "Gains confidence in his abilities and leadership skills",
-            "quotes": "Guys. Guys. Hear me out. Meta Hackathon. This weekend. Billionaires. Buzzwords. Free food. Never doubt the power of buzzwords."
-        },
-        "THOMAS": {
-            "description": "A laid-back and sarcastic intern who provides comic relief",
-            "traits": ["humorous", "skeptical", "laid-back"],
-            "skills_or_powers": ["distraction", "pretending to code"],
-            "items": ["Reddit on his phone"],
-            "motivations": "To have fun and win the hackathon",
-            "arc": "Becomes more invested in the project",
-            "quotes": "Do we get a shirt? We believe dogs don't just bark. They communicate. And we're here to listen."
-        },
-        "NYASHA": {
-            "description": "A practical and concerned intern who worries about their lack of coding skills",
-            "traits": ["cautious", "resourceful", "practical"],
-            "skills_or_powers": ["problem-solving", "recording sounds"],
-            "items": ["protein shake"],
-            "motivations": "To survive the hackathon without getting caught",
-            "arc": "Learns to adapt to unexpected situations",
-            "quotes": "Wait. You want to crash a hackathon? We can't even spell JavaScript. Okay, maybe we *should* Google how to make a website. This must be a mistake."
-        },
-        "PAUL": {
-            "description": "A lazy but funny intern who accidentally contributes to the project",
-            "traits": ["lazy", "funny", "accidental genius"],
-            "skills_or_powers": ["accidentally causing unexpected outcomes"],
-            "items": ["ChatGPT", "LangChain"],
-            "motivations": "To nap and accidentally win",
-            "arc": "Discovers his accidental genius",
-            "quotes": "Did someone say... AI sniffing dog butts? Budget blown. Worth it. Also, it gives treats when they say 'I love you.'"
-        },
-        "SECURITY GUARD": {
-            "description": "A security guard at Meta HQ who lets the team in",
-            "traits": ["permissive", "unquestioning"],
-            "skills_or_powers": ["access control"],
+    # Pattern 2: Look for dialogue patterns (character names followed by dialogue)
+    for i, line in enumerate(lines):
+        if ':' in line and len(line.split(':')) == 2:
+            speaker = line.split(':')[0].strip()
+            if speaker and speaker[0].isupper():
+                character_names.add(speaker)
+    
+    # Pattern 3: Look for "said [Name]" patterns
+    for line in lines:
+        matches = re.findall(r'said\s+([A-Z][a-z]+)', line, re.IGNORECASE)
+        for match in matches:
+            character_names.add(match)
+    
+    # Convert to list and filter out common words
+    character_list = list(character_names)
+    character_list = [name for name in character_list if len(name) > 2]
+    
+    # Create character entries
+    for name in character_list[:20]:  # Limit to first 20 characters
+        characters.append({
+            "name": name,
+            "aliases": [],
+            "description": f"Character from {title or 'the story'}",
+            "roles": ["Character"],
+            "traits": [],
+            "skills_or_powers": [],
             "items": [],
-            "motivations": "To do his job efficiently",
-            "arc": "Unknowingly helps the underdogs",
-            "quotes": "Team name?"
-        }
-    }
+            "motivations": "",
+            "arc": "",
+            "relationships": [],
+            "quotes": ""
+        })
     
-    # Create character entries with detailed information
-    for name in character_names:
-        if name in character_info:
-            info = character_info[name]
-            characters.append({
-                "name": name,
-                "aliases": [],
-                "description": info["description"],
-                "roles": ["Main character" if name in ["DIEGO", "THOMAS", "NYASHA", "PAUL"] else "Supporting character"],
-                "traits": info["traits"],
-                "skills_or_powers": info["skills_or_powers"],
-                "items": info["items"],
-                "motivations": info["motivations"],
-                "arc": info["arc"],
-                "relationships": [
-                    {
-                        "with": "Team Pawgrammers",
-                        "label": "Team member",
-                        "details": f"{name} is part of the Chewy intern team that participates in the hackathon",
-                        "history": "Met as interns at Chewy",
-                        "quotes": info["quotes"]
-                    }
-                ],
-                "quotes": info["quotes"]
-            })
-        else:
-            # Basic entry for other characters
-            characters.append({
-                "name": name,
-                "aliases": [],
-                "description": f"Character from {title}",
-                "roles": ["Supporting character"],
-                "traits": [],
-                "skills_or_powers": [],
-                "items": [],
-                "motivations": "",
-                "arc": "",
-                "relationships": [],
-                "quotes": ""
-            })
+    # Extract main events from the text
+    main_events = []
+    paragraphs = book_text.split('\n\n')
     
-    # Create detailed storyline events
-    main_events = [
-        {
-            "event": "Team Formation at Chewy",
-            "quotes": "Guys. Guys. Hear me out. Meta Hackathon. This weekend. Billionaires. Buzzwords. Free food.",
-            "details": "Diego convinces his fellow interns Thomas, Nyasha, and Paul to join the Meta Hackathon despite their lack of coding experience. They're all working at Chewy and decide to bluff their way in."
-        },
-        {
-            "event": "Arrival at Meta HQ",
-            "quotes": "Team...Pawgrammers.",
-            "details": "The team arrives at Meta HQ in San Francisco. They successfully enter by claiming to be 'Team Pawgrammers' from Chewy, building an AI-powered pet recommendation system."
-        },
-        {
-            "event": "Hackathon Floor Chaos",
-            "quotes": "Okay, maybe we *should* Google how to make a website.",
-            "details": "On the hackathon floor, the team realizes they have no idea how to code. Nyasha suggests Googling how to make a website, while Thomas suggests outsourcing to someone on Fiverr."
-        },
-        {
-            "event": "Project Development",
-            "quotes": "I'm DM'ing a guy on Fiverr named TechBeast07. He says he'll build the whole thing for $40.",
-            "details": "Diego contacts a freelancer on Fiverr to build their project. Paul accidentally connects ChatGPT with LangChain, creating a semi-functional AI assistant that responds in pirate voice."
-        },
-        {
-            "event": "Final Presentation",
-            "quotes": "We believe dogs don't just bark. They communicate. And we're here to listen.",
-            "details": "The team presents 'SniffSense' - an AI-powered assistant that recommends pet products based on vocal tone, tail wag frequency, and mood. They deliver an emotional pitch that moves the audience."
-        },
-        {
-            "event": "Victory Celebration",
-            "quotes": "And first place goes to... Pawgrammers from Chewy!",
-            "details": "Against all odds, Team Pawgrammers wins first place. They rush to the stage, hugging awkwardly, with Thomas holding the giant check upside down."
-        },
-        {
-            "event": "Post-Victory Walk",
-            "quotes": "Still can't believe we won. Same. Wanna go to another one next week?",
-            "details": "The team walks down Market Street with confetti in their hair and empty Red Bull cans in their hands. They discuss going to another hackathon next week."
-        }
-    ]
+    for i, paragraph in enumerate(paragraphs[:10]):  # Limit to first 10 paragraphs
+        if len(paragraph.strip()) > 50:  # Only significant paragraphs
+            main_events.append({
+                "event": f"Event {i+1}",
+                "quotes": "",
+                "details": paragraph.strip()[:200] + "..." if len(paragraph) > 200 else paragraph.strip()
+            })
     
     # Create basic knowledge graph structure
     knowledge_graph = {
         "book_info": {
-            "title": title or "HACK THE IMPAWSSIBLE",
+            "title": title or "Uploaded Story",
             "author": "Unknown",
             "publication_year": "",
-            "genre": "Comedy / Adventure / Tech Underdog",
-            "themes": ["Hackathon", "Friendship", "Underdog story", "Imposter syndrome", "Teamwork"],
-            "tone_and_style": "Comedic and lighthearted with witty dialogue",
-            "narrative_point_of_view": "Third person omniscient",
-            "summary": "Four clueless interns from Chewy bluff their way into the Meta Hackathon with zero coding experience. Armed only with charisma, caffeine, and chaos, they accidentally build an AI that changes the game—and wins first place.",
-            "intended_audience": "General audience, tech enthusiasts, comedy fans"
+            "genre": "Story",
+            "themes": [],
+            "tone_and_style": "",
+            "narrative_point_of_view": "",
+            "summary": f"Story uploaded by user containing {len(character_list)} characters and {len(main_events)} main events.",
+            "intended_audience": "General audience"
         },
         "characters": characters,
         "storyline": {
             "main_events": main_events,
-            "timeline": ["Day 1: Team formation", "Day 2: Hackathon entry", "Day 3: Project development", "Day 4: Final presentation and victory"],
-            "locations": ["Chewy HQ - Internship Basement Room", "Meta HQ - San Francisco", "Meta Hackathon Floor", "Final Pitch Stage", "Winner Ceremony", "Market Street"],
-            "foreshadowing": ["Diego's confidence in buzzwords", "Paul's accidental genius with AI"],
-            "motifs_symbols": ["Buzzwords", "Free food", "Red Bull cans", "Confetti", "Giant check"],
-            "narrative_tension": ["Will they get caught?", "Can they actually build something?", "Will they win?"]
+            "timeline": [],
+            "locations": [],
+            "foreshadowing": [],
+            "motifs_symbols": [],
+            "narrative_tension": []
         }
     }
     

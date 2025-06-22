@@ -7,7 +7,6 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from dotenv import load_dotenv
-from llama_api_client import LlamaAPIClient
 
 # Load environment variables
 load_dotenv()
@@ -16,10 +15,21 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev_secret_key")
 
-# Setup Llama client
-client = LlamaAPIClient(
-    api_key=os.environ.get("LLAMA_API_KEY"),
-)
+# Setup Llama client (with fallback)
+try:
+    from llama_api_client import LlamaAPIClient
+    client = LlamaAPIClient(
+        api_key=os.environ.get("LLAMA_API_KEY"),
+    )
+    API_AVAILABLE = True
+except ImportError:
+    print("Warning: llama_api_client not found. Using fallback mode.")
+    API_AVAILABLE = False
+    client = None
+except Exception as e:
+    print(f"Warning: API setup failed: {e}. Using fallback mode.")
+    API_AVAILABLE = False
+    client = None
 
 # Paths
 KG_PATH = "knowledge_base/world_knowledge_graph.yaml"
@@ -133,113 +143,116 @@ def chat():
     # Create prompt
     prompt = create_character_prompt(character, dynamic_world, character_chat_history)
     
-    # Call Llama API
-    try:
-        completion = client.chat.completions.create(
-            model="Llama-4-Maverick-17B-128E-Instruct-FP8",  # Or whichever model you're using
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ]
-        )
-        
-        response_text = completion.completion_message.content.text
-        
-        # Extract world updates if any
-        world_updates = extract_world_updates(response_text)
-        
-        # Clean response (remove the world update block)
-        clean_response = re.sub(r'\[WORLD_UPDATE\].*?\[/WORLD_UPDATE\]', '', response_text, flags=re.DOTALL).strip()
-        
-        # Add response to chat history
-        chat_history.append({
-            "sender": "character",
-            "character": character,
-            "content": clean_response,
-            "timestamp": datetime.now().isoformat()
-        })
-        
-        # Update session
-        session['unified_chat_history'] = chat_history
-        
-        # Update dynamic world if needed
-        if world_updates:
-            update_type = world_updates.get("update_type")
+    # Call Llama API or use fallback
+    if API_AVAILABLE and client:
+        try:
+            completion = client.chat.completions.create(
+                model="Llama-4-Maverick-17B-128E-Instruct-FP8",  # Or whichever model you're using
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ]
+            )
             
-            if update_type == "item_acquired":
-                char_name = world_updates.get("character")
-                item = world_updates.get("item")
-                
-                # Find character and add item
-                for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
-                    if char.get("name") == char_name:
-                        if "items" not in char:
-                            char["items"] = []
-                        if item not in char["items"]:
-                            char["items"].append(item)
-                        break
-            
-            elif update_type == "item_lost":
-                char_name = world_updates.get("character")
-                item = world_updates.get("item")
-                
-                # Find character and remove item
-                for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
-                    if char.get("name") == char_name:
-                        if "items" in char and item in char["items"]:
-                            char["items"].remove(item)
-                        break
-            
-            elif update_type == "skill_acquired":
-                char_name = world_updates.get("character")
-                skill = world_updates.get("skill")
-                
-                # Find character and add skill
-                for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
-                    if char.get("name") == char_name:
-                        if "skills_or_powers" not in char:
-                            char["skills_or_powers"] = []
-                        if skill not in char["skills_or_powers"]:
-                            char["skills_or_powers"].append(skill)
-                        break
-            
-            elif update_type == "skill_lost":
-                char_name = world_updates.get("character")
-                skill = world_updates.get("skill")
-                
-                # Find character and remove skill
-                for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
-                    if char.get("name") == char_name:
-                        if "skills_or_powers" in char and skill in char["skills_or_powers"]:
-                            char["skills_or_powers"].remove(skill)
-                        break
-            
-            elif update_type == "location_change":
-                char_name = world_updates.get("character")
-                location = world_updates.get("location")
-                
-                # Find character and update location
-                for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
-                    if char.get("name") == char_name:
-                        char["current_location"] = location
-                        break
-            
-            # Save updated dynamic world
-            save_dynamic_world(dynamic_world)
+            response_text = completion.completion_message.content.text
+        except Exception as e:
+            print(f"Error calling Llama API: {e}")
+            response_text = create_fallback_response(character, message, dynamic_world)
+    else:
+        # Use fallback response
+        response_text = create_fallback_response(character, message, dynamic_world)
+    
+    # Extract world updates if any
+    world_updates = extract_world_updates(response_text)
+    
+    # Clean response (remove the world update block)
+    clean_response = re.sub(r'\[WORLD_UPDATE\].*?\[/WORLD_UPDATE\]', '', response_text, flags=re.DOTALL).strip()
+    
+    # Add response to chat history
+    chat_history.append({
+        "sender": "character",
+        "character": character,
+        "content": clean_response,
+        "timestamp": datetime.now().isoformat()
+    })
+    
+    # Update session
+    session['unified_chat_history'] = chat_history
+    
+    # Update dynamic world if needed
+    if world_updates:
+        update_type = world_updates.get("update_type")
         
-        # Save chat history to file (for persistence)
-        save_chat_history_to_file(chat_history)
+        if update_type == "item_acquired":
+            char_name = world_updates.get("character")
+            item = world_updates.get("item")
+            
+            # Find character and add item
+            for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
+                if char.get("name") == char_name:
+                    if "items" not in char:
+                        char["items"] = []
+                    if item not in char["items"]:
+                        char["items"].append(item)
+                    break
         
-        return jsonify({
-            "response": clean_response,
-            "world_updated": world_updates is not None
-        })
+        elif update_type == "item_lost":
+            char_name = world_updates.get("character")
+            item = world_updates.get("item")
+            
+            # Find character and remove item
+            for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
+                if char.get("name") == char_name:
+                    if "items" in char and item in char["items"]:
+                        char["items"].remove(item)
+                    break
         
-    except Exception as e:
-        print(f"Error calling Llama API: {e}")
-        return jsonify({"error": str(e)}), 500
+        elif update_type == "skill_acquired":
+            char_name = world_updates.get("character")
+            skill = world_updates.get("skill")
+            
+            # Find character and add skill
+            for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
+                if char.get("name") == char_name:
+                    if "skills_or_powers" not in char:
+                        char["skills_or_powers"] = []
+                    if skill not in char["skills_or_powers"]:
+                        char["skills_or_powers"].append(skill)
+                    break
+        
+        elif update_type == "skill_lost":
+            char_name = world_updates.get("character")
+            skill = world_updates.get("skill")
+            
+            # Find character and remove skill
+            for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
+                if char.get("name") == char_name:
+                    if "skills_or_powers" in char and skill in char["skills_or_powers"]:
+                        char["skills_or_powers"].remove(skill)
+                    break
+        
+        elif update_type == "location_change":
+            char_name = world_updates.get("character")
+            location = world_updates.get("location")
+            
+            # Find character and update location
+            for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
+                if char.get("name") == char_name:
+                    char["current_location"] = location
+                    break
+        
+        # Save updated dynamic world
+        save_dynamic_world(dynamic_world)
+    
+    # Save chat history to file (for persistence)
+    save_chat_history_to_file(chat_history)
+    
+    return jsonify({
+        "response": clean_response,
+        "world_updated": world_updates is not None
+    })
 
 def save_chat_history_to_file(chat_history):
     """Save the unified chat history to a file"""
@@ -291,6 +304,76 @@ CONVERSATION HISTORY:
         prompt += f"{sender}: {msg['content']}\n"
     
     return prompt
+
+def create_fallback_response(character, message, dynamic_world):
+    """Create a fallback response when API is not available"""
+    # Get character details
+    character_details = None
+    for char in dynamic_world["user_specific_knowledge_graph"]["characters"]:
+        if char.get("name") == character:
+            character_details = char
+            break
+    
+    if not character_details:
+        return "Sorry, I don't know that character."
+    
+    # Simple keyword-based responses
+    message_lower = message.lower()
+    
+    if "hello" in message_lower or "hi" in message_lower:
+        if character == "DIEGO":
+            return "Hey there! Ready to hack the impossible? 💪"
+        elif character == "THOMAS":
+            return "Yo! What's up? Ready for some chaos?"
+        elif character == "NYASHA":
+            return "Hi! I'm still a bit nervous about this whole hackathon thing..."
+        elif character == "PAUL":
+            return "Hey... *yawns* What time is it?"
+        else:
+            return f"Hello! I'm {character}. Nice to meet you!"
+    
+    elif "hackathon" in message_lower:
+        if character == "DIEGO":
+            return "The Meta Hackathon is going to be epic! We're going to win this thing with pure charisma and buzzwords!"
+        elif character == "THOMAS":
+            return "Yeah, the hackathon. Do we get free shirts? That's the real question."
+        elif character == "NYASHA":
+            return "I'm still not sure we should be doing this... We can't even spell JavaScript!"
+        elif character == "PAUL":
+            return "Hackathon? Oh right, that thing. I'll just nap through it."
+    
+    elif "code" in message_lower or "programming" in message_lower:
+        if character == "DIEGO":
+            return "Coding is just a state of mind! We'll figure it out as we go."
+        elif character == "THOMAS":
+            return "I'm totally coding right now. *randomly presses keys*"
+        elif character == "NYASHA":
+            return "Maybe we should Google how to make a website first?"
+        elif character == "PAUL":
+            return "I accidentally connected ChatGPT to LangChain. Does that count as coding?"
+    
+    elif "win" in message_lower or "victory" in message_lower:
+        if character == "DIEGO":
+            return "Never doubt the power of buzzwords! We're going to win this!"
+        elif character == "THOMAS":
+            return "We believe dogs don't just bark. They communicate. And we're here to listen."
+        elif character == "NYASHA":
+            return "This must be a mistake... We actually won?"
+        elif character == "PAUL":
+            return "Also, it gives treats when they say 'I love you.'"
+    
+    else:
+        # Default responses based on character personality
+        if character == "DIEGO":
+            return "That's a great point! Let me tell you about our revolutionary AI-powered solution..."
+        elif character == "THOMAS":
+            return "Interesting... *checks Reddit*"
+        elif character == "NYASHA":
+            return "I'm not sure about that, but maybe we should think about it carefully..."
+        elif character == "PAUL":
+            return "Sure, whatever. *naps*"
+        else:
+            return f"That's interesting! As {character}, I think we should consider all possibilities."
 
 @app.route('/')
 def index():
@@ -423,7 +506,7 @@ def save_character():
             return jsonify({"success": False, "error": "Knowledge graph not found"}), 404
         
         with open(KG_PATH, 'r', encoding='utf-8') as f:
-            kg = json.load(f)
+            kg = yaml.safe_load(f)
             
         characters = kg.get("characters", [])
         if not characters:
@@ -493,7 +576,7 @@ def get_characters():
             return jsonify({"success": False, "error": "Knowledge graph not found"}), 404
         
         with open(KG_PATH, 'r', encoding='utf-8') as f:
-            kg = json.load(f)
+            kg = yaml.safe_load(f)
             
         characters = kg.get("characters", [])
         if not characters:
@@ -511,7 +594,7 @@ def generate_knowledge_graph():
         script_dir = os.path.dirname(os.path.abspath(__file__))
         
         # Build path to knowledge graph builder script
-        script_path = os.path.join(script_dir, "knowledge_graph_builder/test_llama_api copy.py")
+        script_path = os.path.join(script_dir, "knowledge_graph_builder/build.py")
         
         # Run the script as a subprocess
         result = subprocess.run(['python3', script_path], capture_output=True, text=True)

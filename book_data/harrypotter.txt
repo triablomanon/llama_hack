@@ -1,137 +1,19 @@
 
-Title: **"HACK THE IMPAWSSIBLE"**
+Star Wars: Shadow of the Jedi
 
-**Genre:** Comedy / Adventure / Tech Underdog
+Setting:
+After the fall of the Empire, its remnants scattered across the galaxy. But the dark side of the Force still lingered. Luke Skywalker traveled from system to system, working to rebuild the Jedi Order.
 
-**Logline:** Four clueless interns from Chewy—Diego, Thomas, Paul, and Nyasha—bluff their way into the Meta Hackathon with zero coding experience. Armed only with charisma, caffeine, and chaos, they accidentally build an AI that changes the game—and wins first place.
+Characters:
+- Kaine Narios – A young starship mechanic from a remote Outer Rim planet who unknowingly possesses a strong connection to the Force.
+- Master Luke Skywalker – The last known Jedi Master, seeking to rebuild the Jedi Order.
+- Enoch Vale – A former Imperial intelligence officer who now leads a secret dark side cult known as The Blades of Kallak.
 
----
+Plot:
+On the dusty, industrial planet of Braxa, Kaine Narios works as a mechanic in a backwater starport. Lately, he's been haunted by strange dreams—visions of battles, fire, and a glowing blue lightsaber in his hand. Deep inside, he senses he's not meant for a quiet life. But he also fears the unknown power stirring within him.
 
-**INT. CHEWY HQ - INTERNSHIP BASEMENT ROOM - DAY**
+Far away, Luke Skywalker senses a new ripple in the Force—raw, unstable, and powerful. He journeys to Braxa and meets Kaine, quickly realizing the young man’s potential. But Luke also senses another presence: dark and familiar.
 
-*A dusty, slightly chaotic intern bullpen. Diego doodles on a whiteboard labeled "Q4 Pet Tech Moonshots." Thomas scrolls Reddit. Nyasha sips a protein shake. Paul naps upright like a disciplined sloth.*
+Enoch Vale, once an Imperial officer, has been gathering Force-sensitive individuals and twisting them toward the dark side. He sees Kaine as the perfect weapon to shape in his image.
 
-**DIEGO**
-Guys. Guys. Hear me out. Meta Hackathon. This weekend. Billionaires. Buzzwords. Free food.
-
-**THOMAS**
-(half-interested)
-Do we get a shirt?
-
-**NYASHA**
-Wait. You want to crash a hackathon? We can’t even spell JavaScript.
-
-**DIEGO**
-Details. We work at Chewy. We say we’re building the next-gen AI-powered PetPal for emotional sniff recognition. Boom. We're in.
-
-**PAUL**
-(waking up)
-Did someone say... AI sniffing dog butts?
-
----
-
-**EXT. META HQ - SAN FRANCISCO - MORNING**
-
-*An intimidating glass tower. Posters read "BUILD THE FUTURE. TODAY." Our quartet stands at the entrance, wearing Chewy shirts and confused grins.*
-
-**SECURITY GUARD**
-Team name?
-
-**DIEGO**
-(winging it)
-Team...Pawgrammers.
-
-*The guard shrugs and waves them through.*
-
----
-
-**INT. META HACKATHON FLOOR - DAY**
-
-*A sea of coders. Laptops hum. Energy drinks spill. VR goggles twitch. The boys sit at a table, blinking at a terminal.*
-
-**NYASHA**
-Okay, maybe we *should* Google how to make a website.
-
-**THOMAS**
-Or hear me out—we outsource.
-
-**DIEGO**
-(frantically typing)
-I’m DM’ing a guy on Fiverr named TechBeast07. He says he’ll build the whole thing for $40.
-
-**PAUL**
-Budget blown. Worth it.
-
----
-
-**MONTAGE** — *set to an 80s synth track titled "Ctrl+Alt+Victory"*
-
-- Thomas pretending to code in front of judges by frantically hitting random keys.
-- Nyasha recording fake dog barks for their AI training set.
-- Diego pitching their app to a judge using phrases like "emotionally intelligent pet recommendation systems."
-- Paul accidentally plugs ChatGPT into the demo with LangChain, causing a semi-functional assistant to respond in pirate voice.
-
----
-
-**INT. META HACKATHON - FINAL PITCH STAGE - NIGHT**
-
-*The top 5 teams are announced. Against all odds, Team Pawgrammers is called.*
-
-**NYASHA**
-This must be a mistake.
-
-**DIEGO**
-Never doubt the power of buzzwords.
-
-*On stage, they present "SniffSense": an AI-powered assistant that recommends pet products based on vocal tone, tail wag frequency, and mood.*
-
-**THOMAS**
-(serious)
-We believe dogs don’t just bark. They communicate. And we’re here to listen.
-
-**PAUL**
-(straight-faced)
-Also, it gives treats when they say "I love you."
-
-*The audience erupts in applause. A tech exec wipes away a tear.*
-
----
-
-**INT. META HACKATHON - WINNER CEREMONY - NIGHT**
-
-*A drumroll. A giant check. The MC shouts—*
-
-**MC**
-And first place goes to... Pawgrammers from Chewy!
-
-**ALL**
-WHAT?!
-
-*They rush on stage, hugging awkwardly. Thomas holds the check upside down.*
-
----
-
-**EXT. SAN FRANCISCO - LATER THAT NIGHT**
-
-*The team walks down Market Street. Confetti in their hair. Empty Red Bull cans in their hands. Paul hums the Avengers theme.*
-
-**NYASHA**
-Still can’t believe we won.
-
-**DIEGO**
-Same. Wanna go to another one next week?
-
-**PAUL**
-Only if we name the next one SniffGPT.
-
-**THOMAS**
-Deal.
-
-*They high-five. Freeze frame.*
-
----
-
-**TEXT ON SCREEN:**
-_The Pawgrammers went on to raise $2M in seed funding from a dog food startup that misunderstood what they built._
-
-**FADE OUT.**
+A choice looms: Will Kaine walk the path of the Jedi—or fall to the shadows?
