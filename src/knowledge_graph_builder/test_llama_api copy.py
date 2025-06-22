@@ -83,7 +83,8 @@ Include book-wide information: title, author, genre, themes, tone/style, point o
     "other_notes": ""
   }}
 }}
-Summarize and organize as much as possible based on the text, leaving fields blank if no info is found. Output ONLY the JSON, with no explanations, markdown, or prose.
+
+Give me as much information as you can based on the text. Output ONLY the JSON, with no explanations, markdown, or prose.
 Here is the book text:
 {book_text}
 """

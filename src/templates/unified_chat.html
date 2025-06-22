@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Story Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #212121;
+            --secondary-color: #757575;
+            --background-color: #ffffff;
+            --surface-color: #fafafa;
+            --divider-color: #e0e0e0;
+            --error-color: #b00020;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --elevation-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+            --border-radius: 4px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-primary);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: var(--background-color);
+            position: fixed; /* This prevents mobile keyboard from pushing content up */
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background-color: var(--surface-color);
+            border-right: 1px solid var(--divider-color);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .sidebar-header {
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: var(--elevation-1);
+            z-index: 1;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: 0.15px;
+        }
+        
+        .user-info {
+            margin-top: 4px;
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0.87;
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        
+        .sidebar-section {
+            padding: 16px;
+            border-bottom: 1px solid var(--divider-color);
+        }
+        
+        .sidebar-section h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            letter-spacing: 0.15px;
+        }
+        
+        .status-list {
+            list-style-type: none;
+        }
+        
+        .status-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .status-list li::before {
+            content: '•';
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+        
+        .character-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--divider-color);
+            border-radius: var(--border-radius);
+            background-color: var(--background-color);
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            color: var(--text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23757575%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+        }
+        
+        .character-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .reset-btn {
+            margin-top: auto;
+            padding: 16px;
+            background-color: transparent;
+            border: none;
+            border-top: 1px solid var(--divider-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+            text-transform: uppercase;
+            transition: background-color 0.2s;
+        }
+        
+        .reset-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Chat Area Styles */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: var(--background-color);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--divider-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--background-color);
+            box-shadow: var(--elevation-1);
+            z-index: 1;
+        }
+        
+        .chat-header h2 {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: 0.15px;
+        }
+        
+        .active-character {
+            font-size: 14px;
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-weight: 500;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: var(--surface-color);
+            max-height: calc(100vh - 130px); /* Adjust based on header and input heights */
+        }
+        
+        .message {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--elevation-1);
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 16px 16px 4px 16px;
+        }
+        
+        .character-message {
+            align-self: flex-start;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            border-radius: 16px 16px 16px 4px;
+        }
+        
+        .sender-label {
+            font-size: 12px;
+            margin-bottom: 4px;
+            font-weight: 500;
+            opacity: 0.87;
+            letter-spacing: 0.1px;
+        }
+        
+        .message-content {
+            font-size: 14px;
+            line-height: 1.5;
+            letter-spacing: 0.25px;
+        }
+        
+        .system-message {
+            align-self: center;
+            background-color: var(--surface-color);
+            color: var(--secondary-color);
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            text-align: center;
+            max-width: 80%;
+            box-shadow: none;
+            border: 1px solid var(--divider-color);
+        }
+        
+        .chat-input {
+            padding: 16px;
+            border-top: 1px solid var(--divider-color);
+            display: flex;
+            gap: 12px;
+            background-color: var(--background-color);
+            position: relative;
+            z-index: 5;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .chat-input-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        .chat-input input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--divider-color);
+            border-radius: var(--border-radius);
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            color: var(--text-primary);
+            background-color: transparent;
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .chat-input button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0 16px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1.25px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .chat-input button:hover {
+            background-color: #000000;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 12px 16px;
+            background-color: var(--background-color);
+            border-radius: 16px 16px 16px 4px;
+            align-self: flex-start;
+            box-shadow: var(--elevation-1);
+            margin-bottom: 8px;
+            max-width: 60px;
+        }
+        
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        /* Mobile Layout */
+        .mobile-nav-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 8px;
+            font-size: 24px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        
+        .mobile-nav-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                bottom: 0;
+                width: 280px;
+                transition: left 0.3s ease;
+                z-index: 10;
+            }
+            
+            .sidebar.active {
+                left: 0;
+                box-shadow: var(--elevation-2);
+            }
+            
+            .mobile-nav-toggle {
+                display: flex;
+                margin-right: 12px;
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 9;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .chat-header h2 {
+                font-size: 18px;
+            }
+            
+            .active-character {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            
+            .chat-messages {
+                padding: 16px 12px;
+            }
+            
+            .chat-input {
+                padding: 14px 12px;
+            }
+        }
+        
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .message {
+                max-width: 90%;
+                padding: 10px 14px;
+            }
+            
+            .chat-input {
+                padding: 10px 8px;
+                gap: 8px;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+            
+            .chat-messages {
+                max-height: calc(100vh - 120px);
+                padding-bottom: 60px; /* Extra padding to prevent messages being hidden behind input */
+            }
+            
+            .chat-input input {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            
+            .chat-input button {
+                padding: 0 12px;
+                font-size: 12px;
+                min-width: 60px;
+            }
+            
+            .sidebar-section h3 {
+                font-size: 14px;
+            }
+            
+            .chat-messages {
+                padding: 10px 8px;
+                gap: 10px;
+            }
+            
+            .chat-header {
+                padding: 10px;
+            }
+            
+            .sidebar-header h2 {
+                font-size: 18px;
+            }
+            
+            .user-info {
+                font-size: 12px;
+            }
+            
+            .message-content {
+                font-size: 13px;
+            }
+            
+            .sender-label {
+                font-size: 11px;
+            }
+            
+            .system-message {
+                font-size: 12px;
+                padding: 6px 12px;
+                max-width: 90%;
+            }
+        }
+        
+        /* Extra small mobile devices */
+        @media (max-width: 375px) {
+            .message {
+                max-width: 95%;
+                padding: 8px 12px;
+            }
+            
+            .chat-input {
+                padding: 8px 6px;
+                gap: 6px;
+            }
+            
+            .chat-input input {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+            
+            .chat-input button {
+                padding: 0 10px;
+                font-size: 11px;
+                min-width: 50px;
+            }
+            
+            .chat-header h2 {
+                font-size: 16px;
+            }
+            
+            .active-character {
+                font-size: 10px;
+                padding: 3px 10px;
+            }
+            
+            .message-content {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            .chat-messages {
+                flex: 1;
+            }
+            
+            .chat-header {
+                padding: 10px 16px;
+            }
+            
+            .chat-input {
+                padding: 10px 16px;
+            }
+            
+            .sidebar-section {
+                padding: 12px 16px;
+            }
+            
+            .sidebar-content {
+                padding: 4px 0;
+            }
+        }
+        
+        /* Landscape mode for mobile devices */
+        @media (max-height: 480px) and (orientation: landscape) {
+            .chat-header {
+                padding: 8px 12px;
+            }
+            
+            .chat-header h2 {
+                font-size: 16px;
+            }
+            
+            .chat-messages {
+                padding: 8px;
+                gap: 8px;
+            }
+            
+            .chat-input {
+                padding: 8px;
+            }
+            
+            .message {
+                padding: 8px 12px;
+            }
+            
+            .sidebar {
+                width: 240px;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .sidebar-header {
+                padding: 8px 12px;
+            }
+            
+            .sidebar-section {
+                padding: 8px 12px;
+            }
+            
+            .reset-btn {
+                padding: 8px;
+            }
+        }
+        
+        /* Landscape mode specific adjustments */
+        body.landscape-mode .chat-messages {
+            padding: 8px;
+        }
+        
+        body.landscape-mode .chat-input {
+            padding: 6px 8px;
+        }
+        
+        body.landscape-mode .message {
+            margin-bottom: 6px;
+        }
+        
+        /* Material Design Ripple Effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            background-color: rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            animation: rippleAnimation 0.6s linear;
+        }
+        
+        @keyframes rippleAnimation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>AI Story Chat</h2>
+                <div class="user-info">You are playing as <strong>{{ character_played }}</strong></div>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <h3>Talk To</h3>
+                    <select id="character-select" class="character-select">
+                        <option value="" disabled selected>Choose a character</option>
+                        {% for character in characters %}
+                            {% if character.name != character_played %}
+                            <option value="{{ character.name }}">{{ character.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Your Items</h3>
+                    <ul id="player-items" class="status-list">
+                        <li>Loading items...</li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Your Skills</h3>
+                    <ul id="player-skills" class="status-list">
+                        <li>Loading skills...</li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>Current Location</h3>
+                    <p id="player-location" class="status-list">Loading location...</p>
+                </div>
+            </div>
+            
+            <button id="reset-button" class="reset-btn">
+                <span class="material-icons">restart_alt</span>
+                Delete All Chat History
+            </button>
+        </aside>
+        
+        <!-- Right Chat Area -->
+        <main class="chat-area">
+            <div class="chat-header">
+                <div style="display: flex; align-items: center;">
+                    <button id="toggle-sidebar" class="mobile-nav-toggle">
+                        <span class="material-icons">menu</span>
+                    </button>
+                    <h2>Story Conversation</h2>
+                </div>
+                <div id="active-character" class="active-character">Select a character</div>
+            </div>
+            
+            <div id="chat-messages" class="chat-messages">
+                <div class="system-message">
+                    Welcome to your new AI story! You are playing as {{ character_played }}. 
+                    Select a character from the sidebar to start a conversation.
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <div class="chat-input-container">
+                    <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
+                </div>
+                <button id="send-button">Send</button>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Elements
+            const chatMessages = document.getElementById("chat-messages");
+            const characterSelect = document.getElementById("character-select");
+            const messageInput = document.getElementById("message-input");
+            const sendButton = document.getElementById("send-button");
+            const resetButton = document.getElementById("reset-button");
+            const playerItems = document.getElementById("player-items");
+            const playerSkills = document.getElementById("player-skills");
+            const playerLocation = document.getElementById("player-location");
+            const activeCharacter = document.getElementById("active-character");
+            const toggleSidebar = document.getElementById("toggle-sidebar");
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("overlay");
+            
+            // Current selected character
+            let currentCharacter = "";
+            
+            // Handle orientation change
+            window.addEventListener("orientationchange", function() {
+                // Close sidebar when orientation changes
+                sidebar.classList.remove("active");
+                overlay.classList.remove("active");
+                
+                // Wait for orientation change to complete and scroll to bottom of chat
+                setTimeout(function() {
+                    adjustLayoutForScreenSize();
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 300);
+            });
+            
+            // Function to adjust layout based on screen size
+            function adjustLayoutForScreenSize() {
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const isLandscape = viewportWidth > viewportHeight;
+                const chatInput = document.querySelector('.chat-input');
+                const chatMessages = document.querySelector('.chat-messages');
+                
+                // Ensure chat input is visible
+                chatInput.style.display = 'flex';
+                
+                // Adjust message container padding based on screen size
+                if (viewportWidth <= 375) {
+                    chatMessages.style.padding = "8px";
+                    chatMessages.style.paddingBottom = "60px";
+                } else if (viewportWidth <= 480) {
+                    chatMessages.style.padding = "10px 8px";
+                    chatMessages.style.paddingBottom = "60px";
+                } else if (viewportWidth <= 768) {
+                    chatMessages.style.padding = "16px 12px";
+                    chatMessages.style.paddingBottom = "16px";
+                } else {
+                    chatMessages.style.padding = "16px";
+                }
+                
+                // Additional adjustments for landscape mode on mobile
+                if (isLandscape && viewportHeight <= 480) {
+                    document.body.classList.add("landscape-mode");
+                    chatInput.style.position = 'fixed';
+                    chatInput.style.bottom = '0';
+                    chatInput.style.left = '0';
+                    chatInput.style.right = '0';
+                    chatInput.style.zIndex = '100';
+                } else {
+                    document.body.classList.remove("landscape-mode");
+                    if (viewportWidth > 480) {
+                        chatInput.style.position = 'relative';
+                    }
+                }
+                
+                // Force redraw on iOS (sometimes needed to show fixed elements)
+                document.body.style.display = 'none';
+                document.body.offsetHeight; // Force reflow
+                document.body.style.display = '';
+            }
+            
+            // Run the adjustment on page load and resize
+            window.addEventListener("resize", adjustLayoutForScreenSize);
+            
+            // Call the function initially
+            adjustLayoutForScreenSize();
+            
+            // Handle virtual keyboard on mobile
+            messageInput.addEventListener('focus', function() {
+                if (window.innerWidth <= 480) {
+                    setTimeout(function() {
+                        window.scrollTo(0, 0);
+                        document.body.scrollTop = 0;
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, 300);
+                }
+            });
+            
+            messageInput.addEventListener('blur', function() {
+                if (window.innerWidth <= 480) {
+                    setTimeout(function() {
+                        window.scrollTo(0, 0);
+                        adjustLayoutForScreenSize();
+                    }, 100);
+                }
+            });
+            
+            // Mobile sidebar toggle
+            toggleSidebar.addEventListener("click", function() {
+                sidebar.classList.toggle("active");
+                overlay.classList.toggle("active");
+            });
+            
+            overlay.addEventListener("click", function() {
+                sidebar.classList.remove("active");
+                overlay.classList.remove("active");
+            });
+            
+            // Material Design Ripple Effect
+            const buttons = document.querySelectorAll("button");
+            buttons.forEach(button => {
+                button.addEventListener("click", function(e) {
+                    const rect = button.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const ripple = document.createElement("span");
+                    ripple.classList.add("ripple");
+                    ripple.style.left = x + "px";
+                    ripple.style.top = y + "px";
+                    
+                    button.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+            
+            // Load world info
+            loadWorldInfo();
+            
+            // Load chat history
+            loadChatHistory();
+            
+            // Character selection change
+            characterSelect.addEventListener("change", function () {
+                currentCharacter = this.value;
+                activeCharacter.textContent = `Talking to: ${currentCharacter}`;
+                messageInput.placeholder = `Message ${currentCharacter}...`;
+                messageInput.focus();
+                
+                // On mobile, close the sidebar after selection
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove("active");
+                    overlay.classList.remove("active");
+                    
+                    // Small delay to ensure focus works properly after sidebar animation
+                    setTimeout(() => {
+                        messageInput.focus();
+                    }, 400);
+                }
+            });
+            
+            // Send message
+            sendButton.addEventListener("click", sendMessage);
+            messageInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    sendMessage();
+                }
+            });
+            
+            // Reset conversation
+            resetButton.addEventListener("click", function() {
+                if (confirm("Are you sure you want to delete all chat history? This cannot be undone.")) {
+                    fetch("/api/reset", {
+                        method: "POST",
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            // Clear chat messages except for the welcome message
+                            chatMessages.innerHTML = `
+                                <div class="system-message">
+                                    Conversation has been completely reset. All chat history has been deleted.
+                                    You are playing as {{ character_played }}. 
+                                    Select a character to start a new conversation.
+                                </div>
+                            `;
+                            currentCharacter = "";
+                            characterSelect.value = "";
+                            activeCharacter.textContent = "Select a character";
+                            
+                            // Also reload world info in case anything changed
+                            loadWorldInfo();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error resetting conversation:", error);
+                        const errorMsg = document.createElement("div");
+                        errorMsg.className = "system-message";
+                        errorMsg.textContent = "Error resetting conversation. Please try again.";
+                        chatMessages.appendChild(errorMsg);
+                    });
+                }
+            });
+            
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (!message) return;
+                
+                if (!currentCharacter) {
+                    // Add system message
+                    const systemMsg = document.createElement("div");
+                    systemMsg.className = "system-message";
+                    systemMsg.textContent = "Please select a character first!";
+                    chatMessages.appendChild(systemMsg);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    // On mobile, show sidebar to help select a character
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.add("active");
+                        overlay.classList.add("active");
+                    }
+                    return;
+                }
+                
+                // Clear input
+                messageInput.value = "";
+                
+                // On mobile, blur the input field to hide the keyboard
+                if (window.innerWidth <= 768) {
+                    messageInput.blur();
+                }
+                
+                // Add user message
+                addMessage("user", "{{ character_played }}", message);
+                
+                // Add typing indicator
+                const typingIndicator = document.createElement("div");
+                typingIndicator.className = "typing-indicator";
+                typingIndicator.innerHTML = `
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                `;
+                chatMessages.appendChild(typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Send to API
+                fetch("/api/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        character: currentCharacter,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove typing indicator
+                    chatMessages.removeChild(typingIndicator);
+                    
+                    if (data.error) {
+                        // Show error
+                        const errorMsg = document.createElement("div");
+                        errorMsg.className = "system-message";
+                        errorMsg.textContent = `Error: ${data.error}`;
+                        chatMessages.appendChild(errorMsg);
+                    } else {
+                        // Add character response
+                        addMessage("character", currentCharacter, data.response);
+                        
+                        // If world was updated, refresh world info
+                        if (data.world_updated) {
+                            loadWorldInfo();
+                            
+                            // Add system message about world update
+                            const updateMsg = document.createElement("div");
+                            updateMsg.className = "system-message";
+                            updateMsg.textContent = "Your world has been updated!";
+                            chatMessages.appendChild(updateMsg);
+                        }
+                    }
+                    
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                })
+                .catch(error => {
+                    // Remove typing indicator
+                    if (typingIndicator.parentNode === chatMessages) {
+                        chatMessages.removeChild(typingIndicator);
+                    }
+                    
+                    // Show error
+                    const errorMsg = document.createElement("div");
+                    errorMsg.className = "system-message";
+                    errorMsg.textContent = "Error connecting to server. Please try again.";
+                    chatMessages.appendChild(errorMsg);
+                    
+                    console.error("Error:", error);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            }
+            
+            function addMessage(type, sender, content) {
+                const messageDiv = document.createElement("div");
+                messageDiv.className = `message ${type}-message`;
+                
+                const senderSpan = document.createElement("div");
+                senderSpan.className = "sender-label";
+                senderSpan.textContent = sender;
+                
+                const contentDiv = document.createElement("div");
+                contentDiv.className = "message-content";
+                contentDiv.textContent = content;
+                
+                messageDiv.appendChild(senderSpan);
+                messageDiv.appendChild(contentDiv);
+                chatMessages.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function loadWorldInfo() {
+                fetch("/api/world")
+                .then(response => response.json())
+                .then(data => {
+                    // Find player character
+                    const playerName = data.user.character_played;
+                    let playerCharacter = null;
+                    
+                    for (const char of data.user_specific_knowledge_graph.characters) {
+                        if (char.name === playerName) {
+                            playerCharacter = char;
+                            break;
+                        }
+                    }
+                    
+                    if (playerCharacter) {
+                        // Update items
+                        if (playerCharacter.items && playerCharacter.items.length > 0) {
+                            playerItems.innerHTML = playerCharacter.items
+                                .map(item => `<li>${item}</li>`)
+                                .join("");
+                        } else {
+                            playerItems.innerHTML = "<li>No items</li>";
+                        }
+                        
+                        // Update skills
+                        if (playerCharacter.skills_or_powers && playerCharacter.skills_or_powers.length > 0) {
+                            playerSkills.innerHTML = playerCharacter.skills_or_powers
+                                .map(skill => `<li>${skill}</li>`)
+                                .join("");
+                        } else {
+                            playerSkills.innerHTML = "<li>No skills</li>";
+                        }
+                        
+                        // Update location
+                        if (playerCharacter.current_location) {
+                            playerLocation.textContent = playerCharacter.current_location;
+                        } else {
+                            playerLocation.textContent = "Unknown";
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading world info:", error);
+                    playerItems.innerHTML = "<li>Error loading items</li>";
+                    playerSkills.innerHTML = "<li>Error loading skills</li>";
+                    playerLocation.textContent = "Error loading location";
+                });
+            }
+            
+            function loadChatHistory() {
+                fetch("/api/chat-history")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        // Set current character if there's chat history
+                        for (let i = data.messages.length - 1; i >= 0; i--) {
+                            if (data.messages[i].character) {
+                                currentCharacter = data.messages[i].character;
+                                characterSelect.value = currentCharacter;
+                                activeCharacter.textContent = `Talking to: ${currentCharacter}`;
+                                messageInput.placeholder = `Message ${currentCharacter}...`;
+                                break;
+                            }
+                        }
+                        
+                        // Add messages to chat
+                        data.messages.forEach(msg => {
+                            const sender = msg.sender === "user" 
+                                ? "{{ character_played }}" 
+                                : msg.character || "Unknown";
+                            addMessage(msg.sender, sender, msg.content);
+                        });
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading chat history:", error);
+                    const errorMsg = document.createElement("div");
+                    errorMsg.className = "system-message";
+                    errorMsg.textContent = "Error loading chat history.";
+                    chatMessages.appendChild(errorMsg);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
